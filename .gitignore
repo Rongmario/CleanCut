@@ -4,3 +4,15 @@ build/
 out/
 
 run/
+
+.gradle/6.5/
+
+.gradle/buildOutputCleanup/
+
+.gradle/checksums/
+
+.gradle/loom-cache/
+
+.gradle/vcs-1/
+
+.idea/
