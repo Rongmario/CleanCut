@@ -16,3 +16,5 @@ run/
 .gradle/vcs-1/
 
 .idea/
+
+.gradle/4.10.3/
