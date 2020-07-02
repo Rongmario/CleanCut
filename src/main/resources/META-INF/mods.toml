@@ -1,0 +1,13 @@
+modLoader="javafml"
+loaderVersion="[31,)"
+issueTrackerURL="https://github.com/Rongmario/CleanCut/issues"
+[[mods]]
+modId="cleancut"
+version="1.0"
+displayName="Clean Cut"
+displayURL="https://github.com/Rongmario/CleanCut"
+logoFile="icon.png"
+authors="Rongmario"
+description='''
+Fight enemies back through grass and other similar obstructions!
+'''

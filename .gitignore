@@ -1,18 +1,25 @@
+# eclipse
+bin
+*.launch
+.settings
+.metadata
+.classpath
+.project
 
-build/
+# idea
+out
+*.ipr
+*.iws
+*.iml
+.idea
 
-out/
+# gradle
+build
+.gradle
 
-run/
+# other
+eclipse
+run
 
-.gradle/6.5/
-
-.gradle/buildOutputCleanup/
-
-.gradle/checksums/
-
-.gradle/loom-cache/
-
-.gradle/vcs-1/
-
-.idea/
+# Files from Forge MDK
+forge*changelog.txt
