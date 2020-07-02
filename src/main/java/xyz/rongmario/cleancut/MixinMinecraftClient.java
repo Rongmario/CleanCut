@@ -1,5 +1,6 @@
 package xyz.rongmario.cleancut;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
@@ -25,6 +26,10 @@ public class MixinMinecraftClient {
 
     @Redirect(method = "doAttack", at = @At(value = "INVOKE", target = "net/minecraft/client/network/ClientPlayerInteractionManager.attackBlock(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;)Z"))
     private boolean checkForEntity(ClientPlayerInteractionManager manager, BlockPos pos, Direction direction) {
+        BlockState clicked = world.getBlockState(pos);
+        if (!clicked.getCollisionShape(world, pos).isEmpty() || clicked.getHardness(world, pos) != 0.0F) {
+            return manager.attackBlock(pos, direction);
+        }
         Vec3d camera = player.getCameraPosVec(1.0F);
         Vec3d rotation = player.getRotationVec(1.0F);
         float reach = manager.getReachDistance();
