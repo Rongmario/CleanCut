@@ -3,7 +3,7 @@ loaderVersion="[32,)"
 issueTrackerURL="https://github.com/Rongmario/CleanCut/issues"
 [[mods]]
 modId="cleancut"
-version="1.0"
+version="2.1"
 displayName="Clean Cut"
 displayURL="https://github.com/Rongmario/CleanCut"
 logoFile="icon.png"

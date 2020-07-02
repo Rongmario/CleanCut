@@ -1,12 +1,15 @@
 package xyz.rongmario.cleancut;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileHelper;
 import net.minecraft.util.EntityPredicates;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
@@ -23,6 +26,12 @@ public class CleanCut {
 
     @SuppressWarnings("ConstantConditions")
     private void onLeftClickBlock(PlayerInteractEvent.LeftClickBlock event) {
+        World world = event.getWorld();
+        BlockPos pos = event.getPos();
+        BlockState clicked = event.getWorld().getBlockState(event.getPos());
+        if (!clicked.getCollisionShape(world, pos).isEmpty() || clicked.getBlockHardness(world, pos) != 0.0F) {
+            return;
+        }
         PlayerEntity player = event.getPlayer();
         Vector3d from = player.getEyePosition(1.0F);
         Vector3d look = player.getLook(1.0F);
