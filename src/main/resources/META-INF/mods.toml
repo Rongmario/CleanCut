@@ -1,9 +1,10 @@
 modLoader="javafml"
 loaderVersion="[32,)"
 issueTrackerURL="https://github.com/Rongmario/CleanCut/issues"
+license="MIT"
 [[mods]]
 modId="cleancut"
-version="2.1"
+version="2.2"
 displayName="Clean Cut"
 displayURL="https://github.com/Rongmario/CleanCut"
 logoFile="icon.png"
