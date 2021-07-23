@@ -1,18 +1,18 @@
 package xyz.rongmario.cleancut;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.ProjectileHelper;
-import net.minecraft.util.EntityPredicates;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.EntityRayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.OwnableEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.fml.common.Mod;
@@ -26,22 +26,28 @@ public class CleanCut {
 
     @SuppressWarnings("ConstantConditions")
     private void onLeftClickBlock(PlayerInteractEvent.LeftClickBlock event) {
-        World world = event.getWorld();
-        BlockPos pos = event.getPos();
-        BlockState clicked = event.getWorld().getBlockState(event.getPos());
-        if (!clicked.getCollisionShape(world, pos).isEmpty() || clicked.getBlockHardness(world, pos) != 0.0F) {
+        System.out.println("Clicked");
+        Level world = event.getWorld();
+        if (!world.isClientSide) {
             return;
         }
-        PlayerEntity player = event.getPlayer();
-        Vector3d from = player.getEyePosition(1.0F);
-        Vector3d look = player.getLook(1.0F);
+        BlockPos pos = event.getPos();
+        BlockState clicked = event.getWorld().getBlockState(event.getPos());
+        if (!clicked.getCollisionShape(world, pos).isEmpty() || clicked.getDestroySpeed(world, pos) != 0.0F) {
+            return;
+        }
+        Player player = event.getPlayer();
         double reach = player.getAttribute(ForgeMod.REACH_DISTANCE.get()).getValue();
         reach = player.isCreative() ? reach : reach - 0.5F;
-        Vector3d to = from.add(look.x * reach, look.y * reach, look.z * reach);
-        EntityRayTraceResult result = ProjectileHelper.rayTraceEntities(player.world, player, from, to, new AxisAlignedBB(from, to), EntityPredicates.CAN_AI_TARGET.and(e -> e.canBeCollidedWith() && e instanceof LivingEntity && !(e instanceof FakePlayer)));
+        Vec3 from = player.getEyePosition(1.0F);
+        Vec3 look = player.getViewVector(1.0F);
+        Vec3 to = from.add(look.x * reach, look.y * reach, look.z * reach);
+        AABB aabb = player.getBoundingBox().expandTowards(look.scale(reach)).inflate(1.0D, 1.0D, 1.0D);
+        EntityHitResult result = ProjectileUtil.getEntityHitResult(player, from, to, aabb, entity -> !entity.isSpectator() && entity.isAttackable(), reach * reach);
         if (result != null) {
             event.setCanceled(true);
-            player.attackTargetEntityWithCurrentItem(result.getEntity());
+            // player.attackTargetEntityWithCurrentItem(result.getEntity());
+            Minecraft.getInstance().gameMode.attack(player, result.getEntity());
         }
     }
 
