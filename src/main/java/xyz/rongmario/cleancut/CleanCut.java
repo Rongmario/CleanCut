@@ -2,8 +2,6 @@ package xyz.rongmario.cleancut;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.level.Level;
@@ -26,7 +24,6 @@ public class CleanCut {
 
     @SuppressWarnings("ConstantConditions")
     private void onLeftClickBlock(PlayerInteractEvent.LeftClickBlock event) {
-        System.out.println("Clicked");
         Level world = event.getWorld();
         if (!world.isClientSide) {
             return;
