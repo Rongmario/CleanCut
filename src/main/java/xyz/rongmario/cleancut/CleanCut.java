@@ -26,7 +26,6 @@ public class CleanCut {
 
     @SuppressWarnings("ConstantConditions")
     private void onLeftClickBlock(PlayerInteractEvent.LeftClickBlock event) {
-        System.out.println("Clicked");
         Level world = event.getWorld();
         if (!world.isClientSide) {
             return;
