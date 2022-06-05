@@ -17,7 +17,7 @@
   "license": "MIT",
   "icon": "assets/cleancut/icon.png",
 
-  "environment": "*",
+  "environment": "client",
   "entrypoints": {
     "main": [
     ]
