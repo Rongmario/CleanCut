@@ -1,14 +1,12 @@
 modLoader="javafml"
-loaderVersion="[37,)"
+loaderVersion="[40,)"
 issueTrackerURL="https://github.com/Rongmario/CleanCut/issues"
 license="MIT"
 [[mods]]
 modId="cleancut"
-version="3.0"
+version="4.0"
 displayName="Clean Cut"
 displayURL="https://github.com/Rongmario/CleanCut"
 logoFile="icon.png"
 authors="Rongmario"
-description='''
-Fight enemies back through grass and other similar obstructions!
-'''
+description='''Fight enemies back through grass and other similar obstructions!'''

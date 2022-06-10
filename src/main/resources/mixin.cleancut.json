@@ -1,0 +1,9 @@
+{
+  "required": true,
+  "package": "zone.rong.cleancut.mixin",
+  "refmap": "mixin.cleancut.refmap.json",
+  "compatibilityLevel": "JAVA_8",
+  "client": [
+    "MinecraftMixin"
+  ]
+}
