@@ -10,7 +10,7 @@ import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.*;
 import net.minecraft.world.phys.HitResult.Type;
-import net.minecraftforge.client.event.InputEvent.ClickInputEvent;
+import net.minecraftforge.client.event.InputEvent.InteractionKeyMappingTriggered;
 import net.minecraftforge.common.ForgeMod;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -32,9 +32,10 @@ public class MinecraftMixin {
     @Inject(method = "startAttack", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;startDestroyBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;)Z"),
             locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
-    private void beforeStartingToBreakBlock(CallbackInfoReturnable<Boolean> cir, boolean flag, ClickInputEvent event, Type hitType, BlockHitResult blockhitresult, BlockPos pos) {
-        BlockState state = level.getBlockState(pos);
-        if (state.getCollisionShape(this.level, pos).isEmpty() || state.getDestroySpeed(this.level, pos) == 0.0F) {
+    private void beforeStartingToBreakBlock(CallbackInfoReturnable<Boolean> cir, boolean flag, InteractionKeyMappingTriggered inputEvent, Type hitType,
+                                            BlockHitResult blockhitresult, BlockPos blockpos) {
+        BlockState state = level.getBlockState(blockpos);
+        if (state.getCollisionShape(this.level, blockpos).isEmpty() || state.getDestroySpeed(this.level, blockpos) == 0.0F) {
             double reach = player.getAttribute(ForgeMod.REACH_DISTANCE.get()).getValue();
             reach = player.isCreative() ? reach : reach - 0.5F;
             Vec3 from = player.getEyePosition(1.0F);
@@ -45,9 +46,7 @@ public class MinecraftMixin {
             if (newResult != null) {
                 this.gameMode.attack(player, newResult.getEntity());
                 cir.setReturnValue(false);
-                if (event.shouldSwingHand()) {
-                    this.player.swing(InteractionHand.MAIN_HAND);
-                }
+                this.player.swing(InteractionHand.MAIN_HAND);
             }
         }
 
