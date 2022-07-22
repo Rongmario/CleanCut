@@ -4,7 +4,7 @@ issueTrackerURL="https://github.com/Rongmario/CleanCut/issues"
 license="MIT"
 [[mods]]
 modId="cleancut"
-version="4.1"
+version="4.2"
 displayName="Clean Cut"
 displayURL="https://github.com/Rongmario/CleanCut"
 logoFile="icon.png"
