@@ -27,7 +27,6 @@ public class MixinMinecraftClient {
 
     @Shadow @Nullable public ClientWorld world;
     @Shadow @Nullable public ClientPlayerEntity player;
-
     @Shadow @Nullable public ClientPlayerInteractionManager interactionManager;
 
     @Inject(method = "doAttack", at = @At(value = "INVOKE",
