@@ -5,9 +5,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
-import net.minecraft.predicate.entity.EntityPredicates;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
@@ -33,7 +32,7 @@ public class MixinMinecraftClient {
     @Inject(method = "doAttack", at = @At(value = "INVOKE",
             target = "net/minecraft/client/network/ClientPlayerInteractionManager.attackBlock(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;)Z"),
             locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
-    private void beforeStartingToBreakBlock(CallbackInfoReturnable<Boolean> cir, boolean flag, BlockHitResult blockhitresult, BlockPos pos) {
+    private void beforeStartingToBreakBlock(CallbackInfoReturnable<Boolean> cir, ItemStack itemStack, boolean bl, BlockHitResult blockHitResult, BlockPos pos) {
         BlockState state = world.getBlockState(pos);
         if (state.getCollisionShape(this.world, pos).isEmpty() || state.getHardness(this.world, pos) == 0.0F) {
             float reach = interactionManager.getReachDistance();
