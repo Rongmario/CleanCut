@@ -1,22 +1,43 @@
-
+.gradle
 build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
 
+### IntelliJ IDEA ###
+.idea/modules.xml
+.idea/jarRepositories.xml
+.idea/compiler.xml
+.idea/libraries/
+*.iws
+*.iml
+*.ipr
 out/
+!**/src/main/**/out/
+!**/src/test/**/out/
 
-run/
+### Eclipse ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
 
-.gradle/6.5/
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
 
-.gradle/buildOutputCleanup/
+### VS Code ###
+.vscode/
 
-.gradle/checksums/
-
-.gradle/loom-cache/
-
-.gradle/vcs-1/
-
-.idea/
-
-.gradle/4.10.3/fileChanges/
-
-.gradle/4.10.3/
+### Mac OS ###
+.DS_Store
+/.idea/
