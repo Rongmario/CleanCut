@@ -1,0 +1,25 @@
+{
+	"schemaVersion": 1,
+	"id": "cleancut",
+	"version": "${version}",
+	"name": "CleanCut",
+	"description": "Fight enemies back through grass and other similar obstructions!",
+	"authors": [
+		"Rongmario"
+	],
+	"contact": {
+		"homepage": "https://www.curseforge.com/minecraft/mc-mods/cleancut",
+		"sources": "https://github.com/Rongmario/CleanCut",
+		"issues": "https://github.com/Rongmario/CleanCut/issues"
+	},
+	"license": "MIT",
+	"icon": "assets/cleancut/icon.png",
+	"environment": "*",
+	"mixins": [
+		"cleancut.mixins.json"
+	],
+	"depends": {
+		"fabricloader": "*",
+		"minecraft": ">=1.19.1"
+	}
+}
