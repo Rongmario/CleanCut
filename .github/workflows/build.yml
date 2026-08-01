@@ -23,6 +23,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+      # Eighteen jobs resolving dependencies at once gets the runners rate
+      # limited by Maven Central (HTTP 429). Six at a time still finishes the
+      # whole matrix in a few minutes.
+      max-parallel: 6
       matrix:
         target: ${{ fromJson(needs.targets.outputs.matrix) }}
     steps:
