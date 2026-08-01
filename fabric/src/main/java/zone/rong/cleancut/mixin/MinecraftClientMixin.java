@@ -48,7 +48,7 @@ public class MinecraftClientMixin {
         return Blocks.AIR.getDefaultState();
     }
 
-    //? if >=1.19.3 {
+    //? if >=1.19 {
     @Redirect(method = "doItemUse", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;interactBlock(Lnet/minecraft/client/network/ClientPlayerEntity;Lnet/minecraft/util/Hand;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/util/ActionResult;"))
     private ActionResult cleancut$interactThroughBlock(ClientPlayerInteractionManager manager, ClientPlayerEntity player, Hand hand, BlockHitResult hitResult) {

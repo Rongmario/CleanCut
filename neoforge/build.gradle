@@ -30,12 +30,10 @@ repositories {
     }
 }
 
+// NeoForge mods ship against Mojang mappings, so mixins need no refmap and
+// Loom keeps the legacy mixin annotation processor switched off here.
 loom {
     silentMojangMappingsLicense()
-    mixin {
-        // Must match the "refmap" entry in cleancut.mixins.json.
-        defaultRefmapName = "${mod_id}.refmap.json"
-    }
 }
 
 dependencies {

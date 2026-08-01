@@ -49,14 +49,15 @@ public final class CleanCut {
         return closestEntity(world, player, start, stopAtBlock(world, player, start, end));
     }
 
-    /** Reach is a game mode value up to 1.20.4 and an attribute from 1.20.5 on. */
+    /**
+     * Reach lives on the interaction manager up to 1.20.4; from 1.20.5 it is an
+     * attribute, read through the player.
+     */
     private static double reach(MinecraftClient client) {
         //? if <1.20.5 {
         return client.interactionManager.getReachDistance();
-        //?} elif <1.21.2 {
-        /*return client.player.getAttributeValue(net.minecraft.entity.attribute.EntityAttributes.PLAYER_ENTITY_INTERACTION_RANGE);
-        *///?} else {
-        /*return client.player.getAttributeValue(net.minecraft.entity.attribute.EntityAttributes.ENTITY_INTERACTION_RANGE);
+        //?} else {
+        /*return client.player.getEntityInteractionRange();
         *///?}
     }
 
@@ -81,7 +82,7 @@ public final class CleanCut {
         Box searchBox = new Box(start, end).expand(1.0);
         Entity closest = null;
         double closestDistance = Double.MAX_VALUE;
-        //? if >=1.17 {
+        //? if >=1.16 {
         for (Entity entity : world.getOtherEntities(player, searchBox, candidate -> canTarget(player, candidate))) {
         //?} else {
         /*for (Entity entity : world.getEntities(player, searchBox, candidate -> canTarget(player, candidate))) {
@@ -109,7 +110,7 @@ public final class CleanCut {
         if (entity == player || entity.isSpectator()) {
             return false;
         }
-        //? if >=1.16 {
+        //? if >=1.19 {
         if (!entity.canHit()) {
         //?} else {
         /*if (!entity.collides()) {
@@ -131,9 +132,9 @@ public final class CleanCut {
         return false;
     }
 
-    /** {@code ActionResult} only grew its convenience methods in 1.16. */
+    /** {@code ActionResult} only grew its convenience methods in 1.15. */
     public static boolean accepted(ActionResult result) {
-        //? if >=1.16 {
+        //? if >=1.15 {
         return result.isAccepted();
         //?} else {
         /*return result == ActionResult.SUCCESS;

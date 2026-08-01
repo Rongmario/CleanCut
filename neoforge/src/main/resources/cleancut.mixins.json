@@ -3,7 +3,6 @@
 	"minVersion": "0.8",
 	"package": "zone.rong.cleancut.mixin",
 	"compatibilityLevel": "${mixin_compat}",
-	"refmap": "${mod_id}.refmap.json",
 	"client": [
 		"MinecraftMixin"
 	],

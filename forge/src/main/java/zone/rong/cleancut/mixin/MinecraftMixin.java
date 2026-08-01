@@ -48,7 +48,7 @@ public class MinecraftMixin {
         return Blocks.AIR.defaultBlockState();
     }
 
-    //? if >=1.19.3 {
+    //? if >=1.19 {
     @Redirect(method = "startUseItem", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;useItemOn(Lnet/minecraft/client/player/LocalPlayer;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/BlockHitResult;)Lnet/minecraft/world/InteractionResult;"))
     private InteractionResult cleancut$interactThroughBlock(MultiPlayerGameMode gameMode, LocalPlayer player, InteractionHand hand, BlockHitResult hitResult) {
