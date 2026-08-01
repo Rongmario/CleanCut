@@ -5,13 +5,13 @@ plugins {
 
 // Everything that differs between Minecraft versions on this loader. Adding a
 // version means adding a row here and listing it in settings.gradle.
-// `forge` is a version range rather than a pin - see the note in
-// neoforge/build.gradle. Pin an exact build if you need reproducible output.
+// Forge/NeoForge build numbers are pinned: Architectury Loom resolves the
+// userdev artifact itself and cannot handle a dynamic version.
 def versionData = [
-        '1.18.2': [forge: '1.18.2-40.+', java: 17, loader: '[40,)', minecraft: '[1.18.2,1.19)'],
-        '1.19.2': [forge: '1.19.2-43.+', java: 17, loader: '[43,)', minecraft: '[1.19.2,1.19.3)'],
-        '1.19.4': [forge: '1.19.4-45.+', java: 17, loader: '[45,)', minecraft: '[1.19.4,1.20)'],
-        '1.20.1': [forge: '1.20.1-47.+', java: 17, loader: '[47,)', minecraft: '[1.20.1,1.20.2)'],
+        '1.18.2': [forge: '1.18.2-40.1.84', java: 17, loader: '[40,)', minecraft: '[1.18.2,1.19)'],
+        '1.19.2': [forge: '1.19.2-43.2.0', java: 17, loader: '[43,)', minecraft: '[1.19.2,1.19.3)'],
+        '1.19.4': [forge: '1.19.4-45.1.0', java: 17, loader: '[45,)', minecraft: '[1.19.4,1.20)'],
+        '1.20.1': [forge: '1.20.1-47.3.22', java: 17, loader: '[47,)', minecraft: '[1.20.1,1.20.2)'],
 ]
 
 def minecraftVersion = stonecutter.current.version

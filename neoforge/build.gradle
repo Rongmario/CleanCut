@@ -5,12 +5,11 @@ plugins {
 
 // Everything that differs between Minecraft versions on this loader. Adding a
 // version means adding a row here and listing it in settings.gradle.
-// `neoforge` is a version range rather than a pin: NeoForge publishes new
-// builds within a Minecraft version continuously, and a stale pin fails the
-// build outright. Pin an exact build here if you need reproducible output.
+// Pinned rather than a range: Architectury Loom resolves the userdev artifact
+// itself and cannot handle a dynamic version.
 def versionData = [
-        '1.21.1': [neoforge: '21.1.+', java: 21, loader: '[21.1,)', minecraft: '[1.21.1,1.21.2)'],
-        '1.21.4': [neoforge: '21.4.+', java: 21, loader: '[21.4,)', minecraft: '[1.21.4,1.21.5)'],
+        '1.21.1': [neoforge: '21.1.230', java: 21, loader: '[21.1,)', minecraft: '[1.21.1,1.21.2)'],
+        '1.21.4': [neoforge: '21.4.84-beta', java: 21, loader: '[21.4,)', minecraft: '[1.21.4,1.21.5)'],
 ]
 
 def minecraftVersion = stonecutter.current.version
