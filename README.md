@@ -17,7 +17,7 @@ Every loader and every Minecraft version is built from this one branch.
 
 | Loader   | Minecraft versions                                                                             |
 |----------|------------------------------------------------------------------------------------------------|
-| Fabric   | 1.14.4, 1.15.2, 1.16.5, 1.17.1, 1.18.2, 1.19.2, 1.19.4, 1.20.1, 1.20.4, 1.20.6, 1.21.1, 1.21.4 through 1.21.11 |
+| Fabric   | 1.14.4, 1.15.2, 1.16.5, 1.17.1, 1.18.2, 1.19.2, 1.19.4, 1.20.1, 1.20.4, 1.20.6, 1.21.1, 1.21.4 through 1.21.8 |
 | Quilt    | same jars as Fabric                                                                            |
 | Forge    | 1.18.2, 1.19.2, 1.19.4, 1.20.1                                                                 |
 | NeoForge | 1.21.1, 1.21.4                                                                                 |
@@ -79,6 +79,23 @@ The checked-out sources are written for one version at a time. Switch with:
 
 Building a version also switches the sources to it, so if `git status` shows
 churn in `src/` after a build, reset the active project and it will go away.
+
+## Newer Minecraft
+
+1.21.8 is where this build stops, and the reason is the toolchain rather than
+the mod. From 1.21.9 Yarn ships unpick v3 data, which needs Fabric Loom 1.17,
+which needs Gradle 9 — and the Gradle wrapper and the Stonecutter version are
+properties of the whole build, not of one branch, so this can't be mixed with
+the Gradle 8 stack the older versions are on.
+
+The same wall stands in front of Minecraft's new version scheme (26.1.2 and
+later), which additionally has no Yarn mappings at all and would have to be
+built against Mojang's.
+
+Getting there means either moving the entire build to Gradle 9, Stonecutter
+0.9 and current Loom — which risks the 1.14-1.16 targets, whose support in
+current Loom is unverified — or keeping this build as it is and adding a
+second, modern Gradle build beside it in the same branch.
 
 ## Adding a Minecraft version
 

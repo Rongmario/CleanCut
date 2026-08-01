@@ -24,9 +24,6 @@ def versionData = [
         '1.21.6': [mappings: '1.21.6+build.1', java: 21],
         '1.21.7': [mappings: '1.21.7+build.1', java: 21],
         '1.21.8': [mappings: '1.21.8+build.1', java: 21],
-        '1.21.9': [mappings: '1.21.9+build.1', java: 21],
-        '1.21.10': [mappings: '1.21.10+build.1', java: 21],
-        '1.21.11': [mappings: '1.21.11+build.3', java: 21],
 ]
 
 def minecraftVersion = stonecutter.current.version

@@ -64,18 +64,6 @@
     "minecraft": "1.21.8"
   },
   {
-    "branch": "fabric",
-    "minecraft": "1.21.9"
-  },
-  {
-    "branch": "fabric",
-    "minecraft": "1.21.10"
-  },
-  {
-    "branch": "fabric",
-    "minecraft": "1.21.11"
-  },
-  {
     "branch": "forge",
     "minecraft": "1.18.2"
   },
