@@ -66,7 +66,7 @@ public final class CleanCut {
      * first block with actual collision.
      */
     private static Vec3d stopAtBlock(ClientWorld world, ClientPlayerEntity player, Vec3d start, Vec3d end) {
-        //? if >=1.16 {
+        //? if >=1.16.2 {
         HitResult hit = world.raycast(new net.minecraft.world.RaycastContext(start, end,
                 net.minecraft.world.RaycastContext.ShapeType.COLLIDER,
                 net.minecraft.world.RaycastContext.FluidHandling.NONE, player));
@@ -82,13 +82,13 @@ public final class CleanCut {
         Box searchBox = new Box(start, end).expand(1.0);
         Entity closest = null;
         double closestDistance = Double.MAX_VALUE;
-        //? if >=1.16 {
+        //? if >=1.16.2 {
         for (Entity entity : world.getOtherEntities(player, searchBox, candidate -> canTarget(player, candidate))) {
         //?} else {
         /*for (Entity entity : world.getEntities(player, searchBox, candidate -> canTarget(player, candidate))) {
         *///?}
             Box hitBox = entity.getBoundingBox().expand(entity.getTargetingMargin());
-            //? if >=1.16 {
+            //? if >=1.16.2 {
             Optional<Vec3d> hit = hitBox.raycast(start, end);
             //?} else {
             /*Optional<Vec3d> hit = hitBox.rayTrace(start, end);
@@ -110,7 +110,7 @@ public final class CleanCut {
         if (entity == player || entity.isSpectator()) {
             return false;
         }
-        //? if >=1.19 {
+        //? if >=1.19.1 {
         if (!entity.canHit()) {
         //?} else {
         /*if (!entity.collides()) {
