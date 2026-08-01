@@ -1,6 +1,12 @@
 .gradle
 build/
+run/
 !gradle/wrapper/gradle-wrapper.jar
+
+### Stonecutter ###
+# Version subprojects are generated from settings.gradle - nothing in them is
+# hand-written, including the Loom platform property (set in settings.gradle).
+versions/*/*
 !**/src/main/**/build/
 !**/src/test/**/build/
 

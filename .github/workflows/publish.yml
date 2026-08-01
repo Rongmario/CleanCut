@@ -1,0 +1,70 @@
+name: Publish
+
+# Publishing runs off a GitHub release: tag it, write the release notes, and
+# every target in .github/targets.json goes out to Modrinth and CurseForge.
+# Use the manual trigger with `dry_run` first to check what would be uploaded.
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Build and validate the uploads without sending them
+        type: boolean
+        default: true
+
+jobs:
+  targets:
+    name: Collect targets
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.read.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: read
+        run: echo "matrix=$(jq -c . .github/targets.json)" >> "$GITHUB_OUTPUT"
+
+  publish:
+    name: ${{ matrix.target.branch }} ${{ matrix.target.minecraft }}
+    needs: targets
+    runs-on: ubuntu-latest
+    strategy:
+      # Uploads are independent; one bad target shouldn't cancel the rest.
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        target: ${{ fromJson(needs.targets.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Publish
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+          CHANGELOG: ${{ github.event.release.body }}
+          PUBLISH_DRY_RUN: ${{ inputs.dry_run && 'true' || '' }}
+        # Retried for the same reason as the build workflow. publishMods is
+        # idempotent up to the point of upload, and a run that got as far as
+        # uploading doesn't fail this way.
+        run: |
+          for attempt in 1 2 3; do
+            if ./gradlew ":${{ matrix.target.branch }}:${{ matrix.target.minecraft }}:publishMods" --configure-on-demand; then
+              exit 0
+            fi
+            echo "::warning::attempt $attempt failed, retrying in $((attempt * 45))s"
+            sleep $((attempt * 45))
+          done
+          exit 1
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.target.branch }}-${{ matrix.target.minecraft }}
+          path: ${{ matrix.target.branch }}/**/build/libs/*.jar
+          if-no-files-found: error

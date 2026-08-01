@@ -1,0 +1,66 @@
+name: Build
+
+# Pushes to a branch with an open pull request would otherwise build twice, once
+# for the push and once for the pull request. Branch pushes are covered by the
+# `pull_request` trigger; `push` only watches the branch nothing opens a pull
+# request against.
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  targets:
+    name: Collect targets
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.read.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: read
+        run: echo "matrix=$(jq -c . .github/targets.json)" >> "$GITHUB_OUTPUT"
+
+  build:
+    name: ${{ matrix.target.branch }} ${{ matrix.target.minecraft }}
+    needs: targets
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      # Eighteen jobs resolving dependencies at once gets the runners rate
+      # limited by Maven Central (HTTP 429). Six at a time still finishes the
+      # whole matrix in a few minutes.
+      max-parallel: 6
+      matrix:
+        target: ${{ fromJson(needs.targets.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      # Retried because Maven Central rate limits us: 79 jobs, each one
+      # fetching its own Minecraft and Forge artifacts from shared runner IPs,
+      # and no writable Actions cache on a pull request branch. Some of those
+      # downloads are Loom's own rather than Gradle's, so they get no retry or
+      # caching of their own - a 429 just fails the build.
+      - name: Build
+        run: |
+          for attempt in 1 2 3; do
+            if ./gradlew ":${{ matrix.target.branch }}:${{ matrix.target.minecraft }}:build" --configure-on-demand; then
+              exit 0
+            fi
+            echo "::warning::attempt $attempt failed, retrying in $((attempt * 45))s"
+            sleep $((attempt * 45))
+          done
+          exit 1
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.target.branch }}-${{ matrix.target.minecraft }}
+          path: ${{ matrix.target.branch }}/**/build/libs/*.jar
+          if-no-files-found: error
