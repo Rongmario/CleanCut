@@ -39,8 +39,21 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
+      # Retried because Maven Central rate limits us: 79 jobs, each one
+      # fetching its own Minecraft and Forge artifacts from shared runner IPs,
+      # and no writable Actions cache on a pull request branch. Some of those
+      # downloads are Loom's own rather than Gradle's, so they get no retry or
+      # caching of their own - a 429 just fails the build.
       - name: Build
-        run: ./gradlew ":${{ matrix.target.branch }}:${{ matrix.target.minecraft }}:build" --configure-on-demand
+        run: |
+          for attempt in 1 2 3; do
+            if ./gradlew ":${{ matrix.target.branch }}:${{ matrix.target.minecraft }}:build" --configure-on-demand; then
+              exit 0
+            fi
+            echo "::warning::attempt $attempt failed, retrying in $((attempt * 45))s"
+            sleep $((attempt * 45))
+          done
+          exit 1
 
       - uses: actions/upload-artifact@v4
         with:

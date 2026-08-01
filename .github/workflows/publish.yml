@@ -50,7 +50,18 @@ jobs:
           CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
           CHANGELOG: ${{ github.event.release.body }}
           PUBLISH_DRY_RUN: ${{ inputs.dry_run && 'true' || '' }}
-        run: ./gradlew ":${{ matrix.target.branch }}:${{ matrix.target.minecraft }}:publishMods" --configure-on-demand
+        # Retried for the same reason as the build workflow. publishMods is
+        # idempotent up to the point of upload, and a run that got as far as
+        # uploading doesn't fail this way.
+        run: |
+          for attempt in 1 2 3; do
+            if ./gradlew ":${{ matrix.target.branch }}:${{ matrix.target.minecraft }}:publishMods" --configure-on-demand; then
+              exit 0
+            fi
+            echo "::warning::attempt $attempt failed, retrying in $((attempt * 45))s"
+            sleep $((attempt * 45))
+          done
+          exit 1
 
       - uses: actions/upload-artifact@v4
         with:
