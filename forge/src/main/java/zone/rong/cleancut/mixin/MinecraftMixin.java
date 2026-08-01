@@ -1,7 +1,6 @@
 package zone.rong.cleancut.mixin;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
@@ -25,17 +24,31 @@ public class MinecraftMixin {
 
     @Shadow @Nullable public MultiPlayerGameMode gameMode;
     @Shadow @Nullable public LocalPlayer player;
-    @Shadow @Nullable public ClientLevel level;
+    // 1.14.4 calls the client's level MultiPlayerLevel; 1.15 renamed it to
+    // ClientLevel. A shadowed field has to name the type exactly, so unlike
+    // CleanCut itself this can't just say Level.
+    //? if >=1.15 {
+    @Shadow @Nullable public net.minecraft.client.multiplayer.ClientLevel level;
+    //?} else {
+    /*@Shadow @Nullable public net.minecraft.client.multiplayer.MultiPlayerLevel level;
+    *///?}
 
     /**
      * Vanilla checks whether the targeted block is air before starting to break
      * it. If it isn't air but also isn't solid, we look for an entity behind it
      * and report air, which drops vanilla into its "swing at nothing" path.
      */
+    //? if >=1.15 {
     @Redirect(method = "startAttack", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/multiplayer/ClientLevel;getBlockState(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;",
             ordinal = 0))
-    private BlockState cleancut$attackThroughBlock(ClientLevel level, BlockPos pos) {
+    private BlockState cleancut$attackThroughBlock(net.minecraft.client.multiplayer.ClientLevel level, BlockPos pos) {
+    //?} else {
+    /*@Redirect(method = "startAttack", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/multiplayer/MultiPlayerLevel;getBlockState(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;",
+            ordinal = 0))
+    private BlockState cleancut$attackThroughBlock(net.minecraft.client.multiplayer.MultiPlayerLevel level, BlockPos pos) {
+    *///?}
         BlockState state = level.getBlockState(pos);
         if (state.isAir()) {
             return state;
@@ -55,10 +68,17 @@ public class MinecraftMixin {
         InteractionResult result = cleancut$interactEntity(hand, hitResult);
         return result != null ? result : gameMode.useItemOn(player, hand, hitResult);
     }
-    //?} else {
+    //?} elif >=1.15 {
     /*@Redirect(method = "startUseItem", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;useItemOn(Lnet/minecraft/client/player/LocalPlayer;Lnet/minecraft/client/multiplayer/ClientLevel;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/BlockHitResult;)Lnet/minecraft/world/InteractionResult;"))
-    private InteractionResult cleancut$interactThroughBlock(MultiPlayerGameMode gameMode, LocalPlayer player, ClientLevel level, InteractionHand hand, BlockHitResult hitResult) {
+    private InteractionResult cleancut$interactThroughBlock(MultiPlayerGameMode gameMode, LocalPlayer player, net.minecraft.client.multiplayer.ClientLevel level, InteractionHand hand, BlockHitResult hitResult) {
+        InteractionResult result = cleancut$interactEntity(hand, hitResult);
+        return result != null ? result : gameMode.useItemOn(player, level, hand, hitResult);
+    }
+    *///?} else {
+    /*@Redirect(method = "startUseItem", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;useItemOn(Lnet/minecraft/client/player/LocalPlayer;Lnet/minecraft/client/multiplayer/MultiPlayerLevel;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/BlockHitResult;)Lnet/minecraft/world/InteractionResult;"))
+    private InteractionResult cleancut$interactThroughBlock(MultiPlayerGameMode gameMode, LocalPlayer player, net.minecraft.client.multiplayer.MultiPlayerLevel level, InteractionHand hand, BlockHitResult hitResult) {
         InteractionResult result = cleancut$interactEntity(hand, hitResult);
         return result != null ? result : gameMode.useItemOn(player, level, hand, hitResult);
     }

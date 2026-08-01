@@ -1,13 +1,13 @@
 package zone.rong.cleancut;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
@@ -33,7 +33,7 @@ public final class CleanCut {
      */
     public static Entity findTarget(Minecraft client, BlockState state, BlockPos pos) {
         LocalPlayer player = client.player;
-        ClientLevel level = client.level;
+        Level level = client.level;
         if (player == null || level == null || client.gameMode == null) {
             return null;
         }
@@ -42,7 +42,7 @@ public final class CleanCut {
         if (!state.getCollisionShape(level, pos).isEmpty()) {
             return null;
         }
-        double reach = client.gameMode.getPickRange();
+        double reach = reach(client);
         Vec3 start = player.getEyePosition(1.0F);
         Vec3 direction = player.getViewVector(1.0F);
         Vec3 end = start.add(direction.x * reach, direction.y * reach, direction.z * reach);
@@ -50,16 +50,28 @@ public final class CleanCut {
     }
 
     /**
+     * Reach lives on the interaction manager up to 1.20.4; from 1.20.5 it is an
+     * attribute, read through the player.
+     */
+    private static double reach(Minecraft client) {
+        //? if <1.20.5 {
+        return client.gameMode.getPickRange();
+        //?} else {
+        /*return client.player.entityInteractionRange();
+        *///?}
+    }
+
+    /**
      * Entities behind a wall are still behind a wall - shorten the search to the
      * first block with actual collision.
      */
-    private static Vec3 stopAtBlock(ClientLevel level, LocalPlayer player, Vec3 start, Vec3 end) {
+    private static Vec3 stopAtBlock(Level level, LocalPlayer player, Vec3 start, Vec3 end) {
         HitResult hit = level.clip(new ClipContext(start, end,
                 ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
         return hit.getType() == HitResult.Type.MISS ? end : hit.getLocation();
     }
 
-    private static Entity closestEntity(ClientLevel level, LocalPlayer player, Vec3 start, Vec3 end) {
+    private static Entity closestEntity(Level level, LocalPlayer player, Vec3 start, Vec3 end) {
         AABB searchBox = new AABB(start, end).inflate(1.0);
         Entity closest = null;
         double closestDistance = Double.MAX_VALUE;
@@ -98,7 +110,17 @@ public final class CleanCut {
         return false;
     }
 
+    /**
+     * {@code InteractionResult} was a plain enum until 1.21.5, when it became a
+     * sealed interface and the enum's helpers went with it.
+     */
     public static boolean accepted(InteractionResult result) {
+        //? if <1.16 {
+        /*return result == InteractionResult.SUCCESS;
+        *///?} elif <1.21.5 {
         return result.consumesAction();
+        //?} else {
+        /*return result instanceof InteractionResult.Success;
+        *///?}
     }
 }

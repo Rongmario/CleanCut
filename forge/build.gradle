@@ -7,11 +7,45 @@ plugins {
 // version means adding a row here and listing it in settings.gradle.
 // Forge/NeoForge build numbers are pinned: Architectury Loom resolves the
 // userdev artifact itself and cannot handle a dynamic version.
+// Each row is Forge's own recommended build for that Minecraft version, taken
+// from files.minecraftforge.net, except where that build turned out not to
+// work with this Loom and the newest one does.
+//
+// Gaps are versions Forge never shipped, with two exceptions that Architectury
+// Loom 1.10 cannot handle at all, on any Forge build: 1.16.1, where remapping
+// Minecraft dies on a name conflict, and 1.16.2, where the mixin annotation
+// processor is handed no SRG mappings and so can't write a refmap.
 def versionData = [
-        '1.18.2': [forge: '1.18.2-40.1.84', java: 17, loader: '[40,)', minecraft: '[1.18.2,1.19)'],
-        '1.19.2': [forge: '1.19.2-43.2.0', java: 17, loader: '[43,)', minecraft: '[1.19.2,1.19.3)'],
-        '1.19.4': [forge: '1.19.4-45.1.0', java: 17, loader: '[45,)', minecraft: '[1.19.4,1.20)'],
-        '1.20.1': [forge: '1.20.1-47.3.22', java: 17, loader: '[47,)', minecraft: '[1.20.1,1.20.2)'],
+        '1.14.4': [forge: '1.14.4-28.2.26', java: 8],
+        '1.15'  : [forge: '1.15-29.0.4', java: 8],
+        '1.15.1': [forge: '1.15.1-30.0.51', java: 8],
+        '1.15.2': [forge: '1.15.2-31.2.57', java: 8],
+        '1.16.3': [forge: '1.16.3-34.1.42', java: 8],
+        '1.16.4': [forge: '1.16.4-35.1.4', java: 8],
+        '1.16.5': [forge: '1.16.5-36.2.34', java: 8],
+        '1.17.1': [forge: '1.17.1-37.1.1', java: 16],
+        '1.18'  : [forge: '1.18-38.0.17', java: 17],
+        '1.18.1': [forge: '1.18.1-39.1.0', java: 17],
+        '1.18.2': [forge: '1.18.2-40.3.0', java: 17],
+        '1.19'  : [forge: '1.19-41.1.0', java: 17],
+        '1.19.1': [forge: '1.19.1-42.0.9', java: 17],
+        '1.19.2': [forge: '1.19.2-43.5.0', java: 17],
+        '1.19.3': [forge: '1.19.3-44.1.0', java: 17],
+        '1.19.4': [forge: '1.19.4-45.4.0', java: 17],
+        '1.20'  : [forge: '1.20-46.0.14', java: 17],
+        '1.20.1': [forge: '1.20.1-47.4.10', java: 17],
+        '1.20.2': [forge: '1.20.2-48.1.0', java: 17],
+        '1.20.3': [forge: '1.20.3-49.0.2', java: 17],
+        '1.20.4': [forge: '1.20.4-49.2.0', java: 17],
+        '1.20.6': [forge: '1.20.6-50.2.0', java: 21],
+        '1.21'  : [forge: '1.21-51.0.33', java: 21],
+        '1.21.1': [forge: '1.21.1-52.1.0', java: 21],
+        '1.21.3': [forge: '1.21.3-53.1.0', java: 21],
+        '1.21.4': [forge: '1.21.4-54.1.14', java: 21],
+        '1.21.5': [forge: '1.21.5-55.1.0', java: 21],
+        '1.21.6': [forge: '1.21.6-56.0.9', java: 21],
+        '1.21.7': [forge: '1.21.7-57.0.3', java: 21],
+        '1.21.8': [forge: '1.21.8-58.1.0', java: 21],
 ]
 
 def minecraftVersion = stonecutter.current.version
@@ -20,6 +54,21 @@ if (target == null) {
     throw new GradleException("No Forge build data for Minecraft ${minecraftVersion}; add a row to forge/build.gradle")
 }
 
+// Derived rather than written out per row: the loader range is "this Forge
+// major or newer", and the Minecraft range is this version only. Bumping the
+// last number gives the exclusive upper bound - it needn't be a real release.
+def forgeMajor = target.forge.substring(target.forge.indexOf('-') + 1).tokenize('.')[0]
+def loaderRange = "[${forgeMajor},)"
+def nextMinecraft = { String mc ->
+    def parts = mc.tokenize('.')
+    while (parts.size() < 3) {
+        parts << '0'
+    }
+    parts[-1] = (parts[-1] as int) + 1
+    parts.join('.')
+}
+def minecraftRange = "[${minecraftVersion},${nextMinecraft(minecraftVersion)})"
+
 version = "${mod_version}+${minecraftVersion}"
 group = mod_group
 
@@ -27,11 +76,26 @@ base {
     archivesName = "${mod_id}-forge-${minecraftVersion}"
 }
 
+// Forge started bundling Mixin partway through the 1.15.2 cycle (31.2.x).
+// Before that - 1.14.4, 1.15 and 1.15.1 - a mixin mod has to bring its own,
+// both to compile against and to load at runtime. See the bootstrap package.
+def shadesMixin = minecraftVersion in ['1.14.4', '1.15', '1.15.1']
+def mixinVersion = '0.8.5'
+
 repositories {
+    // Also where Mixin itself comes from, for the versions that shade it -
+    // adding a second repository here upsets Loom's repository handling.
     maven {
         name = 'MinecraftForge'
         url = 'https://maven.minecraftforge.net/'
     }
+    mavenCentral()
+}
+
+// Mixin classes go into the jar itself on the versions Forge doesn't supply
+// them. Everywhere else this configuration stays empty.
+configurations {
+    shaded
 }
 
 loom {
@@ -50,6 +114,27 @@ dependencies {
     minecraft "com.mojang:minecraft:${minecraftVersion}"
     mappings loom.officialMojangMappings()
     forge "net.minecraftforge:forge:${target.forge}"
+
+    if (shadesMixin) {
+        // Compile against Mixin and run the annotation processor over it, so
+        // the refmap still gets generated, then put Mixin in the jar.
+        compileOnly "org.spongepowered:mixin:${mixinVersion}"
+        annotationProcessor "org.spongepowered:mixin:${mixinVersion}"
+        // Mixin's POM marks these provided, so the annotation processor would
+        // otherwise start up and immediately fail on NoClassDefFoundError.
+        annotationProcessor 'com.google.code.gson:gson:2.8.9'
+        annotationProcessor 'com.google.guava:guava:31.1-jre'
+        shaded "org.spongepowered:mixin:${mixinVersion}"
+    }
+}
+
+// The ModLauncher service that starts Mixin is only wanted where Mixin is
+// shaded; on every other version Forge has already done all of this, and
+// running it twice would be worse than not running it at all.
+sourceSets.main.java {
+    if (!shadesMixin) {
+        exclude 'zone/rong/cleancut/bootstrap/**'
+    }
 }
 
 processResources {
@@ -63,13 +148,18 @@ processResources {
             mod_homepage         : mod_homepage,
             mod_sources          : mod_sources,
             mod_issues           : mod_issues,
-            minecraft_dependency : target.minecraft,
-            loader_version_range : target.loader,
+            minecraft_dependency : minecraftRange,
+            loader_version_range : loaderRange,
             mixin_compat         : "JAVA_${target.java}",
     ]
     inputs.properties(properties)
     filesMatching(['META-INF/mods.toml', '*.mixins.json']) {
         expand(properties)
+    }
+    // Same reasoning as the source exclusion above: no bootstrap service
+    // registration on versions where Forge starts Mixin itself.
+    if (!shadesMixin) {
+        exclude 'META-INF/services/**'
     }
 }
 
@@ -84,6 +174,28 @@ java {
 jar {
     from(rootProject.file('LICENSE')) {
         rename { "${it}_${mod_name}" }
+    }
+
+    if (shadesMixin) {
+        // Mixin's own classes, plus the META-INF/services entries that make
+        // ModLauncher pick up its launch plugin. Forge's mod directory scanner
+        // reads services straight out of the jars in mods/, which is what makes
+        // a shaded Mixin work at all on these versions.
+        // Wrapped in a closure so the configuration is resolved when the jar is
+        // built, not while the project is being configured - resolving it early
+        // uses Loom's repositories before Loom has finished setting them up.
+        from({ configurations.shaded.collect { zipTree(it) } }) {
+            exclude 'META-INF/MANIFEST.MF'
+            exclude 'META-INF/*.SF'
+            exclude 'META-INF/*.DSA'
+            exclude 'META-INF/*.RSA'
+            // Mixin's annotation processor did its work at compile time and has
+            // no business in a shipped jar.
+            exclude 'org/spongepowered/tools/**'
+            exclude 'META-INF/services/javax.annotation.processing.Processor'
+            exclude 'META-INF/services/org.spongepowered.tools.obfuscation.service.IObfuscationService'
+        }
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     }
 }
 

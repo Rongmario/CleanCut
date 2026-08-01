@@ -7,9 +7,24 @@ plugins {
 // version means adding a row here and listing it in settings.gradle.
 // Pinned rather than a range: Architectury Loom resolves the userdev artifact
 // itself and cannot handle a dynamic version.
+// NeoForge's version number encodes the Minecraft one: 21.4.x is Minecraft
+// 1.21.4. The newest stable build of each line is pinned; a few lines never
+// left beta, and those are marked. 1.20.2 is as far back as NeoForge goes.
 def versionData = [
-        '1.21.1': [neoforge: '21.1.230', java: 21, loader: '[21.1,)', minecraft: '[1.21.1,1.21.2)'],
-        '1.21.4': [neoforge: '21.4.84-beta', java: 21, loader: '[21.4,)', minecraft: '[1.21.4,1.21.5)'],
+        '1.20.2': [neoforge: '20.2.93', java: 17],
+        '1.20.3': [neoforge: '20.3.8-beta', java: 17],   // no stable build
+        '1.20.4': [neoforge: '20.4.251', java: 17],
+        '1.20.5': [neoforge: '20.5.21-beta', java: 21],  // no stable build
+        '1.20.6': [neoforge: '20.6.139', java: 21],
+        '1.21'  : [neoforge: '21.0.167', java: 21],
+        '1.21.1': [neoforge: '21.1.248', java: 21],
+        '1.21.2': [neoforge: '21.2.1-beta', java: 21],   // no stable build
+        '1.21.3': [neoforge: '21.3.97', java: 21],
+        '1.21.4': [neoforge: '21.4.157', java: 21],
+        '1.21.5': [neoforge: '21.5.98', java: 21],
+        '1.21.6': [neoforge: '21.6.20-beta', java: 21],  // no stable build
+        '1.21.7': [neoforge: '21.7.25-beta', java: 21],  // no stable build
+        '1.21.8': [neoforge: '21.8.54', java: 21],
 ]
 
 def minecraftVersion = stonecutter.current.version
@@ -17,6 +32,25 @@ def target = versionData[minecraftVersion]
 if (target == null) {
     throw new GradleException("No NeoForge build data for Minecraft ${minecraftVersion}; add a row to neoforge/build.gradle")
 }
+
+// Derived rather than written out per row: the loader range is "this NeoForge
+// line or newer", and the Minecraft range is this version only.
+def neoLine = target.neoforge.tokenize('.')[0..1].join('.')
+def loaderRange = "[${neoLine},)"
+def nextMinecraft = { String mc ->
+    def parts = mc.tokenize('.')
+    while (parts.size() < 3) {
+        parts << '0'
+    }
+    parts[-1] = (parts[-1] as int) + 1
+    parts.join('.')
+}
+def minecraftRange = "[${minecraftVersion},${nextMinecraft(minecraftVersion)})"
+
+// The mod metadata file was called META-INF/mods.toml until NeoForge 21.0
+// renamed it. One file in the source tree, emitted under whichever name this
+// version reads.
+def modsTomlName = neoLine.startsWith('20.') ? 'META-INF/mods.toml' : 'META-INF/neoforge.mods.toml'
 
 version = "${mod_version}+${minecraftVersion}"
 group = mod_group
@@ -55,13 +89,17 @@ processResources {
             mod_homepage         : mod_homepage,
             mod_sources          : mod_sources,
             mod_issues           : mod_issues,
-            minecraft_dependency : target.minecraft,
-            loader_version_range : target.loader,
+            minecraft_dependency : minecraftRange,
+            loader_version_range : loaderRange,
             mixin_compat         : "JAVA_${target.java}",
     ]
     inputs.properties(properties)
+    inputs.property('modsTomlName', modsTomlName)
     filesMatching(['META-INF/neoforge.mods.toml', '*.mixins.json']) {
         expand(properties)
+    }
+    filesMatching('META-INF/neoforge.mods.toml') {
+        path = modsTomlName
     }
 }
 

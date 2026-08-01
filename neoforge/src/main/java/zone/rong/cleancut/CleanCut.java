@@ -42,11 +42,23 @@ public final class CleanCut {
         if (!state.getCollisionShape(level, pos).isEmpty()) {
             return null;
         }
-        double reach = player.entityInteractionRange();
+        double reach = reach(client);
         Vec3 start = player.getEyePosition(1.0F);
         Vec3 direction = player.getViewVector(1.0F);
         Vec3 end = start.add(direction.x * reach, direction.y * reach, direction.z * reach);
         return closestEntity(level, player, start, stopAtBlock(level, player, start, end));
+    }
+
+    /**
+     * Reach lives on the interaction manager up to 1.20.4; from 1.20.5 it is an
+     * attribute, read through the player.
+     */
+    private static double reach(Minecraft client) {
+        //? if <1.20.5 {
+        return client.gameMode.getPickRange();
+        //?} else {
+        /*return client.player.entityInteractionRange();
+        *///?}
     }
 
     /**
@@ -98,7 +110,15 @@ public final class CleanCut {
         return false;
     }
 
+    /**
+     * {@code InteractionResult} was a plain enum until 1.21.5, when it became a
+     * sealed interface and the enum's helpers went with it.
+     */
     public static boolean accepted(InteractionResult result) {
+        //? if <1.21.5 {
         return result.consumesAction();
+        //?} else {
+        /*return result instanceof InteractionResult.Success;
+        *///?}
     }
 }

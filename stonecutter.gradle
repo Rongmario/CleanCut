@@ -5,4 +5,4 @@ plugins {
 // Switch the checked-out sources to another target with:
 //   ./gradlew "Set active project to 1.19.2"
 // Stonecutter rewrites the line below itself - don't edit it by hand.
-stonecutter.active '1.20.1' /* [SC] DO NOT EDIT */
+stonecutter.active '1.20.2' /* [SC] DO NOT EDIT */

@@ -4,11 +4,9 @@ run/
 !gradle/wrapper/gradle-wrapper.jar
 
 ### Stonecutter ###
-# Version subprojects are generated from settings.gradle. The only hand-written
-# thing in them is gradle.properties, which carries properties Loom needs before
-# its plugin is applied.
+# Version subprojects are generated from settings.gradle - nothing in them is
+# hand-written, including the Loom platform property (set in settings.gradle).
 versions/*/*
-!versions/*/gradle.properties
 !**/src/main/**/build/
 !**/src/test/**/build/
 

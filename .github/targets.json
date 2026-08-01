@@ -5,7 +5,35 @@
   },
   {
     "branch": "fabric",
+    "minecraft": "1.15"
+  },
+  {
+    "branch": "fabric",
+    "minecraft": "1.15.1"
+  },
+  {
+    "branch": "fabric",
     "minecraft": "1.15.2"
+  },
+  {
+    "branch": "fabric",
+    "minecraft": "1.16"
+  },
+  {
+    "branch": "fabric",
+    "minecraft": "1.16.1"
+  },
+  {
+    "branch": "fabric",
+    "minecraft": "1.16.2"
+  },
+  {
+    "branch": "fabric",
+    "minecraft": "1.16.3"
+  },
+  {
+    "branch": "fabric",
+    "minecraft": "1.16.4"
   },
   {
     "branch": "fabric",
@@ -13,7 +41,19 @@
   },
   {
     "branch": "fabric",
+    "minecraft": "1.17"
+  },
+  {
+    "branch": "fabric",
     "minecraft": "1.17.1"
+  },
+  {
+    "branch": "fabric",
+    "minecraft": "1.18"
+  },
+  {
+    "branch": "fabric",
+    "minecraft": "1.18.1"
   },
   {
     "branch": "fabric",
@@ -21,7 +61,19 @@
   },
   {
     "branch": "fabric",
+    "minecraft": "1.19"
+  },
+  {
+    "branch": "fabric",
+    "minecraft": "1.19.1"
+  },
+  {
+    "branch": "fabric",
     "minecraft": "1.19.2"
+  },
+  {
+    "branch": "fabric",
+    "minecraft": "1.19.3"
   },
   {
     "branch": "fabric",
@@ -29,7 +81,19 @@
   },
   {
     "branch": "fabric",
+    "minecraft": "1.20"
+  },
+  {
+    "branch": "fabric",
     "minecraft": "1.20.1"
+  },
+  {
+    "branch": "fabric",
+    "minecraft": "1.20.2"
+  },
+  {
+    "branch": "fabric",
+    "minecraft": "1.20.3"
   },
   {
     "branch": "fabric",
@@ -37,11 +101,27 @@
   },
   {
     "branch": "fabric",
+    "minecraft": "1.20.5"
+  },
+  {
+    "branch": "fabric",
     "minecraft": "1.20.6"
   },
   {
     "branch": "fabric",
+    "minecraft": "1.21"
+  },
+  {
+    "branch": "fabric",
     "minecraft": "1.21.1"
+  },
+  {
+    "branch": "fabric",
+    "minecraft": "1.21.2"
+  },
+  {
+    "branch": "fabric",
+    "minecraft": "1.21.3"
   },
   {
     "branch": "fabric",
@@ -65,7 +145,55 @@
   },
   {
     "branch": "forge",
+    "minecraft": "1.14.4"
+  },
+  {
+    "branch": "forge",
+    "minecraft": "1.15"
+  },
+  {
+    "branch": "forge",
+    "minecraft": "1.15.1"
+  },
+  {
+    "branch": "forge",
+    "minecraft": "1.15.2"
+  },
+  {
+    "branch": "forge",
+    "minecraft": "1.16.3"
+  },
+  {
+    "branch": "forge",
+    "minecraft": "1.16.4"
+  },
+  {
+    "branch": "forge",
+    "minecraft": "1.16.5"
+  },
+  {
+    "branch": "forge",
+    "minecraft": "1.17.1"
+  },
+  {
+    "branch": "forge",
+    "minecraft": "1.18"
+  },
+  {
+    "branch": "forge",
+    "minecraft": "1.18.1"
+  },
+  {
+    "branch": "forge",
     "minecraft": "1.18.2"
+  },
+  {
+    "branch": "forge",
+    "minecraft": "1.19"
+  },
+  {
+    "branch": "forge",
+    "minecraft": "1.19.1"
   },
   {
     "branch": "forge",
@@ -73,11 +201,91 @@
   },
   {
     "branch": "forge",
+    "minecraft": "1.19.3"
+  },
+  {
+    "branch": "forge",
     "minecraft": "1.19.4"
   },
   {
     "branch": "forge",
+    "minecraft": "1.20"
+  },
+  {
+    "branch": "forge",
     "minecraft": "1.20.1"
+  },
+  {
+    "branch": "forge",
+    "minecraft": "1.20.2"
+  },
+  {
+    "branch": "forge",
+    "minecraft": "1.20.3"
+  },
+  {
+    "branch": "forge",
+    "minecraft": "1.20.4"
+  },
+  {
+    "branch": "forge",
+    "minecraft": "1.20.6"
+  },
+  {
+    "branch": "forge",
+    "minecraft": "1.21"
+  },
+  {
+    "branch": "forge",
+    "minecraft": "1.21.1"
+  },
+  {
+    "branch": "forge",
+    "minecraft": "1.21.3"
+  },
+  {
+    "branch": "forge",
+    "minecraft": "1.21.4"
+  },
+  {
+    "branch": "forge",
+    "minecraft": "1.21.5"
+  },
+  {
+    "branch": "forge",
+    "minecraft": "1.21.6"
+  },
+  {
+    "branch": "forge",
+    "minecraft": "1.21.7"
+  },
+  {
+    "branch": "forge",
+    "minecraft": "1.21.8"
+  },
+  {
+    "branch": "neoforge",
+    "minecraft": "1.20.2"
+  },
+  {
+    "branch": "neoforge",
+    "minecraft": "1.20.3"
+  },
+  {
+    "branch": "neoforge",
+    "minecraft": "1.20.4"
+  },
+  {
+    "branch": "neoforge",
+    "minecraft": "1.20.5"
+  },
+  {
+    "branch": "neoforge",
+    "minecraft": "1.20.6"
+  },
+  {
+    "branch": "neoforge",
+    "minecraft": "1.21"
   },
   {
     "branch": "neoforge",
@@ -85,6 +293,30 @@
   },
   {
     "branch": "neoforge",
+    "minecraft": "1.21.2"
+  },
+  {
+    "branch": "neoforge",
+    "minecraft": "1.21.3"
+  },
+  {
+    "branch": "neoforge",
     "minecraft": "1.21.4"
+  },
+  {
+    "branch": "neoforge",
+    "minecraft": "1.21.5"
+  },
+  {
+    "branch": "neoforge",
+    "minecraft": "1.21.6"
+  },
+  {
+    "branch": "neoforge",
+    "minecraft": "1.21.7"
+  },
+  {
+    "branch": "neoforge",
+    "minecraft": "1.21.8"
   }
 ]
