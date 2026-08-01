@@ -221,10 +221,6 @@
   },
   {
     "branch": "forge",
-    "minecraft": "1.20.3"
-  },
-  {
-    "branch": "forge",
     "minecraft": "1.20.4"
   },
   {

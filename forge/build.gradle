@@ -11,10 +11,13 @@ plugins {
 // from files.minecraftforge.net, except where that build turned out not to
 // work with this Loom and the newest one does.
 //
-// Gaps are versions Forge never shipped, with two exceptions that Architectury
-// Loom 1.10 cannot handle at all, on any Forge build: 1.16.1, where remapping
-// Minecraft dies on a name conflict, and 1.16.2, where the mixin annotation
-// processor is handed no SRG mappings and so can't write a refmap.
+// Gaps are versions Forge never shipped, with three exceptions. Architectury
+// Loom 1.10 cannot handle 1.16.1 at all, where remapping Minecraft dies on a
+// name conflict, nor 1.16.2, where the mixin annotation processor is handed no
+// SRG mappings and so can't write a refmap. And 1.20.3-49.0.2 asks for
+// net.minecraftforge:bootstrap-dev:2.0.0, which was never published; a later
+// build off the 49 line may well work, but its numbers couldn't be checked
+// from where this was written. NeoForge covers 1.20.3.
 def versionData = [
         '1.14.4': [forge: '1.14.4-28.2.26', java: 8],
         '1.15'  : [forge: '1.15-29.0.4', java: 8],
@@ -35,7 +38,6 @@ def versionData = [
         '1.20'  : [forge: '1.20-46.0.14', java: 17],
         '1.20.1': [forge: '1.20.1-47.4.10', java: 17],
         '1.20.2': [forge: '1.20.2-48.1.0', java: 17],
-        '1.20.3': [forge: '1.20.3-49.0.2', java: 17],
         '1.20.4': [forge: '1.20.4-49.2.0', java: 17],
         '1.20.6': [forge: '1.20.6-50.2.0', java: 21],
         '1.21'  : [forge: '1.21-51.0.33', java: 21],

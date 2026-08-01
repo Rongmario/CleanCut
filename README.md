@@ -31,6 +31,10 @@ jar — there's nothing extra to build, and releases are tagged for both.
 Most gaps are releases that loader never shipped for: Forge went straight from
 1.16 to 1.16.1 and from 1.17 to 1.17.1, and skipped 1.20.5 and 1.21.2 entirely.
 
+Forge 1.20.3 is also missing: its recommended build asks for
+`net.minecraftforge:bootstrap-dev:2.0.0`, which was never published. A later
+build off the 49 line may well fix it. NeoForge covers 1.20.3 either way.
+
 Forge 1.16.1 and 1.16.2 are the exception — Forge shipped them, but the
 Architectury Loom this build uses cannot produce them on any Forge build: 1.16.1
 dies remapping Minecraft on a name conflict, and on 1.16.2 the mixin annotation
