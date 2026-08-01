@@ -20,6 +20,13 @@ def versionData = [
         '1.20.6': [mappings: '1.20.6+build.3', java: 21],
         '1.21.1': [mappings: '1.21.1+build.3', java: 21],
         '1.21.4': [mappings: '1.21.4+build.8', java: 21],
+        '1.21.5': [mappings: '1.21.5+build.1', java: 21],
+        '1.21.6': [mappings: '1.21.6+build.1', java: 21],
+        '1.21.7': [mappings: '1.21.7+build.1', java: 21],
+        '1.21.8': [mappings: '1.21.8+build.1', java: 21],
+        '1.21.9': [mappings: '1.21.9+build.1', java: 21],
+        '1.21.10': [mappings: '1.21.10+build.1', java: 21],
+        '1.21.11': [mappings: '1.21.11+build.3', java: 21],
 ]
 
 def minecraftVersion = stonecutter.current.version
