@@ -1,8 +1,12 @@
 name: Build
 
+# Pushes to a branch with an open pull request would otherwise build twice, once
+# for the push and once for the pull request. Branch pushes are covered by the
+# `pull_request` trigger; `push` only watches the branch nothing opens a pull
+# request against.
 on:
   push:
-    branches: ['**']
+    branches: [master]
   pull_request:
   workflow_dispatch:
 
