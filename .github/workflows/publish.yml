@@ -21,6 +21,20 @@ jobs:
       matrix: ${{ steps.read.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
+
+      # A jar carries the version from gradle.properties, not the tag. Without
+      # this, tagging v7.0.1 while mod_version still says 7.0.0 publishes 80
+      # files under the old version, and CurseForge files can't be replaced.
+      - name: Check the tag matches mod_version
+        if: github.event_name == 'release'
+        run: |
+          declared=$(sed -n 's/^mod_version[[:space:]]*=[[:space:]]*//p' gradle.properties | tr -d '[:space:]')
+          tagged=${GITHUB_REF_NAME#v}
+          if [ "$declared" != "$tagged" ]; then
+            echo "::error::release ${GITHUB_REF_NAME} would publish mod_version ${declared}; bump gradle.properties or retag"
+            exit 1
+          fi
+
       - id: read
         run: echo "matrix=$(jq -c . .github/targets.json)" >> "$GITHUB_OUTPUT"
 
@@ -31,7 +45,11 @@ jobs:
     strategy:
       # Uploads are independent; one bad target shouldn't cancel the rest.
       fail-fast: false
-      max-parallel: 1
+      # Each job decompiles its own Minecraft, so a target costs minutes, and
+      # there are 80 of them - serial uploads would run most of a day. Four at
+      # a time matches the build workflow's headroom against Maven Central and
+      # stays well inside both platforms' upload rate limits.
+      max-parallel: 4
       matrix:
         target: ${{ fromJson(needs.targets.outputs.matrix) }}
     steps:
