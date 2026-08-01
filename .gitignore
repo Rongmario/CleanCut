@@ -1,6 +1,12 @@
 .gradle
 build/
+run/
 !gradle/wrapper/gradle-wrapper.jar
+
+### Stonecutter ###
+# Version subprojects are generated from settings.gradle - nothing in them is
+# authored by hand, so none of it belongs in the repository.
+versions/
 !**/src/main/**/build/
 !**/src/test/**/build/
 

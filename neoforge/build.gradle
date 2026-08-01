@@ -1,0 +1,109 @@
+plugins {
+    id 'dev.architectury.loom' version '1.10-SNAPSHOT'
+    id 'me.modmuss50.mod-publish-plugin' version '2.2.0'
+}
+
+// Everything that differs between Minecraft versions on this loader. Adding a
+// version means adding a row here and listing it in settings.gradle.
+def versionData = [
+        '1.21.1': [neoforge: '21.1.77', java: 21, loader: '[21.1,)', minecraft: '[1.21.1,1.21.2)'],
+        '1.21.4': [neoforge: '21.4.86', java: 21, loader: '[21.4,)', minecraft: '[1.21.4,1.21.5)'],
+]
+
+def minecraftVersion = stonecutter.current.version
+def target = versionData[minecraftVersion]
+if (target == null) {
+    throw new GradleException("No NeoForge build data for Minecraft ${minecraftVersion}; add a row to neoforge/build.gradle")
+}
+
+version = "${mod_version}+${minecraftVersion}"
+group = mod_group
+
+base {
+    archivesName = "${mod_id}-neoforge-${minecraftVersion}"
+}
+
+repositories {
+    maven {
+        name = 'NeoForged'
+        url = 'https://maven.neoforged.net/releases'
+    }
+}
+
+loom {
+    silentMojangMappingsLicense()
+    mixin {
+        // Must match the "refmap" entry in cleancut.mixins.json.
+        defaultRefmapName = "${mod_id}.refmap.json"
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${minecraftVersion}"
+    mappings loom.officialMojangMappings()
+    neoForge "net.neoforged:neoforge:${target.neoforge}"
+}
+
+processResources {
+    def properties = [
+            version              : version,
+            mod_id               : mod_id,
+            mod_name             : mod_name,
+            mod_description      : mod_description,
+            mod_author           : mod_author,
+            mod_license          : mod_license,
+            mod_homepage         : mod_homepage,
+            mod_sources          : mod_sources,
+            mod_issues           : mod_issues,
+            minecraft_dependency : target.minecraft,
+            loader_version_range : target.loader,
+            mixin_compat         : "JAVA_${target.java}",
+    ]
+    inputs.properties(properties)
+    filesMatching(['META-INF/neoforge.mods.toml', '*.mixins.json']) {
+        expand(properties)
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = target.java
+}
+
+java {
+    withSourcesJar()
+}
+
+jar {
+    from(rootProject.file('LICENSE')) {
+        rename { "${it}_${mod_name}" }
+    }
+}
+
+publishMods {
+    file = tasks.remapJar.archiveFile
+    displayName = "${mod_name} ${mod_version} - NeoForge ${minecraftVersion}"
+    version = "${mod_version}+${minecraftVersion}-neoforge"
+    changelog = providers.environmentVariable('CHANGELOG')
+            .orElse("See ${mod_sources}/releases".toString())
+    type = STABLE
+    modLoaders.add('neoforge')
+    dryRun.set(providers.environmentVariable('PUBLISH_DRY_RUN').map { it == 'true' }.orElse(false))
+
+    if (modrinth_id) {
+        modrinth {
+            projectId = modrinth_id
+            accessToken = providers.environmentVariable('MODRINTH_TOKEN')
+            minecraftVersions.add(minecraftVersion)
+        }
+    }
+
+    if (curseforge_id) {
+        curseforge {
+            projectId = curseforge_id
+            accessToken = providers.environmentVariable('CURSEFORGE_TOKEN')
+            minecraftVersions.add(minecraftVersion)
+            clientRequired = true
+            serverRequired = false
+        }
+    }
+}

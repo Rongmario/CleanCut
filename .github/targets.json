@@ -1,0 +1,20 @@
+[
+  { "branch": "fabric", "minecraft": "1.14.4" },
+  { "branch": "fabric", "minecraft": "1.15.2" },
+  { "branch": "fabric", "minecraft": "1.16.5" },
+  { "branch": "fabric", "minecraft": "1.17.1" },
+  { "branch": "fabric", "minecraft": "1.18.2" },
+  { "branch": "fabric", "minecraft": "1.19.2" },
+  { "branch": "fabric", "minecraft": "1.19.4" },
+  { "branch": "fabric", "minecraft": "1.20.1" },
+  { "branch": "fabric", "minecraft": "1.20.4" },
+  { "branch": "fabric", "minecraft": "1.20.6" },
+  { "branch": "fabric", "minecraft": "1.21.1" },
+  { "branch": "fabric", "minecraft": "1.21.4" },
+  { "branch": "forge", "minecraft": "1.18.2" },
+  { "branch": "forge", "minecraft": "1.19.2" },
+  { "branch": "forge", "minecraft": "1.19.4" },
+  { "branch": "forge", "minecraft": "1.20.1" },
+  { "branch": "neoforge", "minecraft": "1.21.1" },
+  { "branch": "neoforge", "minecraft": "1.21.4" }
+]

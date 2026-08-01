@@ -1,0 +1,115 @@
+plugins {
+    id 'dev.architectury.loom' version '1.10-SNAPSHOT'
+    id 'me.modmuss50.mod-publish-plugin' version '2.2.0'
+}
+
+// Everything that differs between Minecraft versions on this loader. Adding a
+// version means adding a row here and listing it in settings.gradle.
+def versionData = [
+        '1.18.2': [forge: '1.18.2-40.2.21', java: 17, loader: '[40,)', minecraft: '[1.18.2,1.19)'],
+        '1.19.2': [forge: '1.19.2-43.3.13', java: 17, loader: '[43,)', minecraft: '[1.19.2,1.19.3)'],
+        '1.19.4': [forge: '1.19.4-45.2.9', java: 17, loader: '[45,)', minecraft: '[1.19.4,1.20)'],
+        '1.20.1': [forge: '1.20.1-47.3.0', java: 17, loader: '[47,)', minecraft: '[1.20.1,1.20.2)'],
+]
+
+def minecraftVersion = stonecutter.current.version
+def target = versionData[minecraftVersion]
+if (target == null) {
+    throw new GradleException("No Forge build data for Minecraft ${minecraftVersion}; add a row to forge/build.gradle")
+}
+
+version = "${mod_version}+${minecraftVersion}"
+group = mod_group
+
+base {
+    archivesName = "${mod_id}-forge-${minecraftVersion}"
+}
+
+repositories {
+    maven {
+        name = 'MinecraftForge'
+        url = 'https://maven.minecraftforge.net/'
+    }
+}
+
+loom {
+    silentMojangMappingsLicense()
+    mixin {
+        // Must match the "refmap" entry in cleancut.mixins.json - Forge reads
+        // the name from the config rather than having it injected.
+        defaultRefmapName = "${mod_id}.refmap.json"
+    }
+    forge {
+        mixinConfig "${mod_id}.mixins.json"
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${minecraftVersion}"
+    mappings loom.officialMojangMappings()
+    forge "net.minecraftforge:forge:${target.forge}"
+}
+
+processResources {
+    def properties = [
+            version              : version,
+            mod_id               : mod_id,
+            mod_name             : mod_name,
+            mod_description      : mod_description,
+            mod_author           : mod_author,
+            mod_license          : mod_license,
+            mod_homepage         : mod_homepage,
+            mod_sources          : mod_sources,
+            mod_issues           : mod_issues,
+            minecraft_dependency : target.minecraft,
+            loader_version_range : target.loader,
+            mixin_compat         : "JAVA_${target.java}",
+    ]
+    inputs.properties(properties)
+    filesMatching(['META-INF/mods.toml', '*.mixins.json']) {
+        expand(properties)
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = target.java
+}
+
+java {
+    withSourcesJar()
+}
+
+jar {
+    from(rootProject.file('LICENSE')) {
+        rename { "${it}_${mod_name}" }
+    }
+}
+
+publishMods {
+    file = tasks.remapJar.archiveFile
+    displayName = "${mod_name} ${mod_version} - Forge ${minecraftVersion}"
+    version = "${mod_version}+${minecraftVersion}-forge"
+    changelog = providers.environmentVariable('CHANGELOG')
+            .orElse("See ${mod_sources}/releases".toString())
+    type = STABLE
+    modLoaders.add('forge')
+    dryRun.set(providers.environmentVariable('PUBLISH_DRY_RUN').map { it == 'true' }.orElse(false))
+
+    if (modrinth_id) {
+        modrinth {
+            projectId = modrinth_id
+            accessToken = providers.environmentVariable('MODRINTH_TOKEN')
+            minecraftVersions.add(minecraftVersion)
+        }
+    }
+
+    if (curseforge_id) {
+        curseforge {
+            projectId = curseforge_id
+            accessToken = providers.environmentVariable('CURSEFORGE_TOKEN')
+            minecraftVersions.add(minecraftVersion)
+            clientRequired = true
+            serverRequired = false
+        }
+    }
+}

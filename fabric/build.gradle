@@ -1,0 +1,108 @@
+plugins {
+    id 'fabric-loom' version '1.10-SNAPSHOT'
+    id 'me.modmuss50.mod-publish-plugin' version '2.2.0'
+}
+
+// Everything that differs between Minecraft versions on this loader. Adding a
+// version means adding a row here and listing it in settings.gradle.
+// `mappings` is the Yarn build; `java` is the release level that version of
+// Minecraft compiles against.
+def versionData = [
+        '1.14.4': [mappings: '1.14.4+build.18', java: 8],
+        '1.15.2': [mappings: '1.15.2+build.17', java: 8],
+        '1.16.5': [mappings: '1.16.5+build.10', java: 8],
+        '1.17.1': [mappings: '1.17.1+build.65', java: 16],
+        '1.18.2': [mappings: '1.18.2+build.4', java: 17],
+        '1.19.2': [mappings: '1.19.2+build.28', java: 17],
+        '1.19.4': [mappings: '1.19.4+build.2', java: 17],
+        '1.20.1': [mappings: '1.20.1+build.10', java: 17],
+        '1.20.4': [mappings: '1.20.4+build.3', java: 17],
+        '1.20.6': [mappings: '1.20.6+build.3', java: 21],
+        '1.21.1': [mappings: '1.21.1+build.3', java: 21],
+        '1.21.4': [mappings: '1.21.4+build.8', java: 21],
+]
+
+def minecraftVersion = stonecutter.current.version
+def target = versionData[minecraftVersion]
+if (target == null) {
+    throw new GradleException("No Fabric build data for Minecraft ${minecraftVersion}; add a row to fabric/build.gradle")
+}
+
+version = "${mod_version}+${minecraftVersion}"
+group = mod_group
+
+base {
+    archivesName = "${mod_id}-fabric-${minecraftVersion}"
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${minecraftVersion}"
+    mappings "net.fabricmc:yarn:${target.mappings}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+}
+
+processResources {
+    def properties = [
+            version              : version,
+            mod_id               : mod_id,
+            mod_name             : mod_name,
+            mod_description      : mod_description,
+            mod_author           : mod_author,
+            mod_license          : mod_license,
+            mod_homepage         : mod_homepage,
+            mod_sources          : mod_sources,
+            mod_issues           : mod_issues,
+            minecraft_dependency : "~${minecraftVersion}",
+            mixin_compat         : "JAVA_${target.java}",
+    ]
+    inputs.properties(properties)
+    filesMatching(['fabric.mod.json', '*.mixins.json']) {
+        expand(properties)
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = target.java
+}
+
+java {
+    withSourcesJar()
+}
+
+jar {
+    from(rootProject.file('LICENSE')) {
+        rename { "${it}_${mod_name}" }
+    }
+}
+
+publishMods {
+    file = tasks.remapJar.archiveFile
+    displayName = "${mod_name} ${mod_version} - Fabric ${minecraftVersion}"
+    version = "${mod_version}+${minecraftVersion}-fabric"
+    changelog = providers.environmentVariable('CHANGELOG')
+            .orElse("See ${mod_sources}/releases".toString())
+    type = STABLE
+    modLoaders.add('fabric')
+    // Quilt Loader reads fabric.mod.json directly, so the Fabric jar is the
+    // Quilt jar. Nothing extra to build, but it gets tagged for Quilt users.
+    modLoaders.add('quilt')
+    dryRun.set(providers.environmentVariable('PUBLISH_DRY_RUN').map { it == 'true' }.orElse(false))
+
+    if (modrinth_id) {
+        modrinth {
+            projectId = modrinth_id
+            accessToken = providers.environmentVariable('MODRINTH_TOKEN')
+            minecraftVersions.add(minecraftVersion)
+        }
+    }
+
+    if (curseforge_id) {
+        curseforge {
+            projectId = curseforge_id
+            accessToken = providers.environmentVariable('CURSEFORGE_TOKEN')
+            minecraftVersions.add(minecraftVersion)
+            clientRequired = true
+            serverRequired = false
+        }
+    }
+}
