@@ -154,15 +154,22 @@ Then build it. If an API moved, the compiler will say so, and the fix is another
 
 Releases go to Modrinth and CurseForge from `.github/workflows/publish.yml`,
 driven by [mod-publish-plugin](https://github.com/modmuss50/mod-publish-plugin).
-One-time setup:
+Both are wired up: the project IDs are in `gradle.properties` (`modrinth_id`,
+`curseforge_id`) and the `MODRINTH_TOKEN` and `CURSEFORGE_TOKEN` secrets are set
+on the repository. Clearing an ID makes that platform get skipped rather than
+fail.
 
-1. Put the project IDs in `gradle.properties` (`modrinth_id`, `curseforge_id`).
-   An empty ID makes that platform get skipped rather than fail.
-2. Add `MODRINTH_TOKEN` and `CURSEFORGE_TOKEN` as repository secrets.
+To cut a release:
 
-Publishing a GitHub release then uploads every target, using the release body as
-the changelog. To rehearse it, run the workflow manually with `dry_run` ticked —
-that builds and validates the uploads without sending anything.
+1. Bump `mod_version` in `gradle.properties` and push it.
+2. Run the workflow manually with `dry_run` ticked. That builds and validates
+   every upload without sending anything.
+3. Tag and publish a GitHub release as `v<mod_version>`. The release body
+   becomes the changelog on both platforms.
+
+The tag has to match `mod_version`, and the workflow stops before uploading
+anything if it doesn't — a jar carries the version it was built with, and a
+file published to CurseForge can't be replaced afterwards.
 
 ## License
 
