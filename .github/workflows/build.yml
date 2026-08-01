@@ -36,7 +36,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
 
       - name: Build
-        run: ./gradlew ":${{ matrix.target.branch }}:${{ matrix.target.minecraft }}:build" --configure-on-demand --stacktrace
+        run: ./gradlew ":${{ matrix.target.branch }}:${{ matrix.target.minecraft }}:build" --configure-on-demand
 
       - uses: actions/upload-artifact@v4
         with:

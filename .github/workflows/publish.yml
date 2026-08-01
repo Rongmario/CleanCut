@@ -50,7 +50,7 @@ jobs:
           CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
           CHANGELOG: ${{ github.event.release.body }}
           PUBLISH_DRY_RUN: ${{ inputs.dry_run && 'true' || '' }}
-        run: ./gradlew ":${{ matrix.target.branch }}:${{ matrix.target.minecraft }}:publishMods" --configure-on-demand --stacktrace
+        run: ./gradlew ":${{ matrix.target.branch }}:${{ matrix.target.minecraft }}:publishMods" --configure-on-demand
 
       - uses: actions/upload-artifact@v4
         with:
