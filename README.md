@@ -45,6 +45,21 @@ On Forge 1.14.4, 1.15 and 1.15.1 the mod carries its own copy of Mixin, because
 Forge only started bundling Mixin partway through 1.15.2. See
 `forge/src/main/java/zone/rong/cleancut/bootstrap/`.
 
+Shipping Mixin inside the mod jar rather than as a second file — the job
+MixinBootstrap usually does — means doing by hand the three things a jar on the
+class path gets for free. ModLauncher builds its launch plugin list before it
+looks at `mods/`, so Mixin's plugin is registered afterwards; Forge treats a jar
+declaring a transformation service as a transformer and not a mod, so the jar
+takes itself back off that exclusion list; and Mixin resolves its own platform
+classes through the context class loader, which this early can't see `mods/`.
+`asm-util` is shaded alongside for the same reason — Mixin needs it and these
+Forge versions don't ship it.
+
+None of this is compiled into 1.15.2 or later, where Forge starts Mixin itself.
+It is reflection into ModLauncher and FML internals, so these three targets are
+worth launching after a toolchain change; building them only proves they
+compile.
+
 NeoForge starts at 1.20.2 because that is its first release. Its 1.20.1 build is
 the Forge fork from before the rename and still lives under
 `net.minecraftforge`, so the **Forge 1.20.1 jar is the NeoForge 1.20.1 jar** —

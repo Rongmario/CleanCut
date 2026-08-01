@@ -83,6 +83,13 @@ base {
 // both to compile against and to load at runtime. See the bootstrap package.
 def shadesMixin = minecraftVersion in ['1.14.4', '1.15', '1.15.1']
 def mixinVersion = '0.8.5'
+// Mixin builds its class-check extension unconditionally, and that needs
+// asm-util, which none of these Forge versions puts on the class path - they
+// ship asm, asm-tree and asm-commons only. So it gets shaded too, at the exact
+// ASM version that Forge already has: everything else ASM delegates to the
+// parent loader first, and a newer asm-util against an older asm core is how
+// you get a NoSuchMethodError instead of a missing class.
+def asmVersion = ['1.14.4': '6.2', '1.15': '7.2', '1.15.1': '7.2'][minecraftVersion]
 
 repositories {
     // Also where Mixin itself comes from, for the versions that shade it -
@@ -127,6 +134,10 @@ dependencies {
         annotationProcessor 'com.google.code.gson:gson:2.8.9'
         annotationProcessor 'com.google.guava:guava:31.1-jre'
         shaded "org.spongepowered:mixin:${mixinVersion}"
+        // Just asm-util, not the ASM it was built against - taking its
+        // transitives would put a whole second copy of ASM in the jar.
+        shaded("org.ow2.asm:asm-util:${asmVersion}") { transitive = false }
+        shaded("org.ow2.asm:asm-analysis:${asmVersion}") { transitive = false }
     }
 }
 
