@@ -33,10 +33,17 @@ if (target == null) {
     throw new GradleException("No NeoForge build data for Minecraft ${minecraftVersion}; add a row to neoforge/build.gradle")
 }
 
-// Derived rather than written out per row: the loader range is "this NeoForge
-// line or newer", and the Minecraft range is this version only.
+// Derived rather than written out per row: the NeoForge range is "this
+// NeoForge line or newer", and the Minecraft range is this version only.
 def neoLine = target.neoforge.tokenize('.')[0..1].join('.')
-def loaderRange = "[${neoLine},)"
+def neoforgeRange = "[${neoLine},)"
+// `loaderVersion` is not that. It is the version of the javafml language
+// provider, which NeoForge numbers on its own line - 1.21.8 ships javafml
+// 9.0.18, not 21.8 - so asking for the NeoForge line there demands a language
+// provider that will never exist and the mod is rejected before it loads.
+// Anything from 1 up, as NeoForge's own template does; the real constraint is
+// the neoforge dependency, which is versioned properly.
+def languageRange = '[1,)'
 def nextMinecraft = { String mc ->
     def parts = mc.tokenize('.')
     while (parts.size() < 3) {
@@ -90,7 +97,8 @@ processResources {
             mod_sources          : mod_sources,
             mod_issues           : mod_issues,
             minecraft_dependency : minecraftRange,
-            loader_version_range : loaderRange,
+            loader_version_range : languageRange,
+            neoforge_dependency  : neoforgeRange,
             mixin_compat         : "JAVA_${target.java}",
     ]
     inputs.properties(properties)
