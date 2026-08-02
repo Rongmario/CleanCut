@@ -1,318 +1,452 @@
 [
   {
     "branch": "fabric",
-    "minecraft": "1.14.4"
+    "minecraft": "1.14.4",
+    "java": 21
   },
   {
     "branch": "fabric",
-    "minecraft": "1.15"
+    "minecraft": "1.15",
+    "java": 21
   },
   {
     "branch": "fabric",
-    "minecraft": "1.15.1"
+    "minecraft": "1.15.1",
+    "java": 21
   },
   {
     "branch": "fabric",
-    "minecraft": "1.15.2"
+    "minecraft": "1.15.2",
+    "java": 21
   },
   {
     "branch": "fabric",
-    "minecraft": "1.16"
+    "minecraft": "1.16",
+    "java": 21
   },
   {
     "branch": "fabric",
-    "minecraft": "1.16.1"
+    "minecraft": "1.16.1",
+    "java": 21
   },
   {
     "branch": "fabric",
-    "minecraft": "1.16.2"
+    "minecraft": "1.16.2",
+    "java": 21
   },
   {
     "branch": "fabric",
-    "minecraft": "1.16.3"
+    "minecraft": "1.16.3",
+    "java": 21
   },
   {
     "branch": "fabric",
-    "minecraft": "1.16.4"
+    "minecraft": "1.16.4",
+    "java": 21
   },
   {
     "branch": "fabric",
-    "minecraft": "1.16.5"
+    "minecraft": "1.16.5",
+    "java": 21
   },
   {
     "branch": "fabric",
-    "minecraft": "1.17"
+    "minecraft": "1.17",
+    "java": 21
   },
   {
     "branch": "fabric",
-    "minecraft": "1.17.1"
+    "minecraft": "1.17.1",
+    "java": 21
   },
   {
     "branch": "fabric",
-    "minecraft": "1.18"
+    "minecraft": "1.18",
+    "java": 21
   },
   {
     "branch": "fabric",
-    "minecraft": "1.18.1"
+    "minecraft": "1.18.1",
+    "java": 21
   },
   {
     "branch": "fabric",
-    "minecraft": "1.18.2"
+    "minecraft": "1.18.2",
+    "java": 21
   },
   {
     "branch": "fabric",
-    "minecraft": "1.19"
+    "minecraft": "1.19",
+    "java": 21
   },
   {
     "branch": "fabric",
-    "minecraft": "1.19.1"
+    "minecraft": "1.19.1",
+    "java": 21
   },
   {
     "branch": "fabric",
-    "minecraft": "1.19.2"
+    "minecraft": "1.19.2",
+    "java": 21
   },
   {
     "branch": "fabric",
-    "minecraft": "1.19.3"
+    "minecraft": "1.19.3",
+    "java": 21
   },
   {
     "branch": "fabric",
-    "minecraft": "1.19.4"
+    "minecraft": "1.19.4",
+    "java": 21
   },
   {
     "branch": "fabric",
-    "minecraft": "1.20"
+    "minecraft": "1.20",
+    "java": 21
   },
   {
     "branch": "fabric",
-    "minecraft": "1.20.1"
+    "minecraft": "1.20.1",
+    "java": 21
   },
   {
     "branch": "fabric",
-    "minecraft": "1.20.2"
+    "minecraft": "1.20.2",
+    "java": 21
   },
   {
     "branch": "fabric",
-    "minecraft": "1.20.3"
+    "minecraft": "1.20.3",
+    "java": 21
   },
   {
     "branch": "fabric",
-    "minecraft": "1.20.4"
+    "minecraft": "1.20.4",
+    "java": 21
   },
   {
     "branch": "fabric",
-    "minecraft": "1.20.5"
+    "minecraft": "1.20.5",
+    "java": 21
   },
   {
     "branch": "fabric",
-    "minecraft": "1.20.6"
+    "minecraft": "1.20.6",
+    "java": 21
   },
   {
     "branch": "fabric",
-    "minecraft": "1.21"
+    "minecraft": "1.21",
+    "java": 21
   },
   {
     "branch": "fabric",
-    "minecraft": "1.21.1"
+    "minecraft": "1.21.1",
+    "java": 21
   },
   {
     "branch": "fabric",
-    "minecraft": "1.21.2"
+    "minecraft": "1.21.2",
+    "java": 21
   },
   {
     "branch": "fabric",
-    "minecraft": "1.21.3"
+    "minecraft": "1.21.3",
+    "java": 21
   },
   {
     "branch": "fabric",
-    "minecraft": "1.21.4"
+    "minecraft": "1.21.4",
+    "java": 21
   },
   {
     "branch": "fabric",
-    "minecraft": "1.21.5"
+    "minecraft": "1.21.5",
+    "java": 21
   },
   {
     "branch": "fabric",
-    "minecraft": "1.21.6"
+    "minecraft": "1.21.6",
+    "java": 21
   },
   {
     "branch": "fabric",
-    "minecraft": "1.21.7"
+    "minecraft": "1.21.7",
+    "java": 21
   },
   {
     "branch": "fabric",
-    "minecraft": "1.21.8"
+    "minecraft": "1.21.8",
+    "java": 21
+  },
+  {
+    "branch": "fabric",
+    "minecraft": "1.21.9",
+    "java": 21
+  },
+  {
+    "branch": "fabric",
+    "minecraft": "1.21.10",
+    "java": 21
+  },
+  {
+    "branch": "fabric",
+    "minecraft": "1.21.11",
+    "java": 21
   },
   {
     "branch": "forge",
-    "minecraft": "1.14.4"
+    "minecraft": "1.14.4",
+    "java": 21
   },
   {
     "branch": "forge",
-    "minecraft": "1.15"
+    "minecraft": "1.15",
+    "java": 21
   },
   {
     "branch": "forge",
-    "minecraft": "1.15.1"
+    "minecraft": "1.15.1",
+    "java": 21
   },
   {
     "branch": "forge",
-    "minecraft": "1.15.2"
+    "minecraft": "1.15.2",
+    "java": 21
   },
   {
     "branch": "forge",
-    "minecraft": "1.16.3"
+    "minecraft": "1.16.3",
+    "java": 21
   },
   {
     "branch": "forge",
-    "minecraft": "1.16.4"
+    "minecraft": "1.16.4",
+    "java": 21
   },
   {
     "branch": "forge",
-    "minecraft": "1.16.5"
+    "minecraft": "1.16.5",
+    "java": 21
   },
   {
     "branch": "forge",
-    "minecraft": "1.17.1"
+    "minecraft": "1.17.1",
+    "java": 21
   },
   {
     "branch": "forge",
-    "minecraft": "1.18"
+    "minecraft": "1.18",
+    "java": 21
   },
   {
     "branch": "forge",
-    "minecraft": "1.18.1"
+    "minecraft": "1.18.1",
+    "java": 21
   },
   {
     "branch": "forge",
-    "minecraft": "1.18.2"
+    "minecraft": "1.18.2",
+    "java": 21
   },
   {
     "branch": "forge",
-    "minecraft": "1.19"
+    "minecraft": "1.19",
+    "java": 21
   },
   {
     "branch": "forge",
-    "minecraft": "1.19.1"
+    "minecraft": "1.19.1",
+    "java": 21
   },
   {
     "branch": "forge",
-    "minecraft": "1.19.2"
+    "minecraft": "1.19.2",
+    "java": 21
   },
   {
     "branch": "forge",
-    "minecraft": "1.19.3"
+    "minecraft": "1.19.3",
+    "java": 21
   },
   {
     "branch": "forge",
-    "minecraft": "1.19.4"
+    "minecraft": "1.19.4",
+    "java": 21
   },
   {
     "branch": "forge",
-    "minecraft": "1.20"
+    "minecraft": "1.20",
+    "java": 21
   },
   {
     "branch": "forge",
-    "minecraft": "1.20.1"
+    "minecraft": "1.20.1",
+    "java": 21
   },
   {
     "branch": "forge",
-    "minecraft": "1.20.2"
+    "minecraft": "1.20.2",
+    "java": 21
   },
   {
     "branch": "forge",
-    "minecraft": "1.20.4"
+    "minecraft": "1.20.4",
+    "java": 21
   },
   {
     "branch": "forge",
-    "minecraft": "1.20.6"
+    "minecraft": "1.20.6",
+    "java": 21
   },
   {
     "branch": "forge",
-    "minecraft": "1.21"
+    "minecraft": "1.21",
+    "java": 21
   },
   {
     "branch": "forge",
-    "minecraft": "1.21.1"
+    "minecraft": "1.21.1",
+    "java": 21
   },
   {
     "branch": "forge",
-    "minecraft": "1.21.3"
+    "minecraft": "1.21.3",
+    "java": 21
   },
   {
     "branch": "forge",
-    "minecraft": "1.21.4"
+    "minecraft": "1.21.4",
+    "java": 21
   },
   {
     "branch": "forge",
-    "minecraft": "1.21.5"
+    "minecraft": "1.21.5",
+    "java": 21
   },
   {
     "branch": "forge",
-    "minecraft": "1.21.6"
+    "minecraft": "1.21.6",
+    "java": 21
   },
   {
     "branch": "forge",
-    "minecraft": "1.21.7"
+    "minecraft": "1.21.7",
+    "java": 21
   },
   {
     "branch": "forge",
-    "minecraft": "1.21.8"
+    "minecraft": "1.21.8",
+    "java": 21
+  },
+  {
+    "branch": "forge",
+    "minecraft": "1.21.9",
+    "java": 21
+  },
+  {
+    "branch": "forge",
+    "minecraft": "1.21.10",
+    "java": 21
+  },
+  {
+    "branch": "forge",
+    "minecraft": "1.21.11",
+    "java": 21
   },
   {
     "branch": "neoforge",
-    "minecraft": "1.20.2"
+    "minecraft": "1.20.2",
+    "java": 21
   },
   {
     "branch": "neoforge",
-    "minecraft": "1.20.3"
+    "minecraft": "1.20.3",
+    "java": 21
   },
   {
     "branch": "neoforge",
-    "minecraft": "1.20.4"
+    "minecraft": "1.20.4",
+    "java": 21
   },
   {
     "branch": "neoforge",
-    "minecraft": "1.20.5"
+    "minecraft": "1.20.5",
+    "java": 21
   },
   {
     "branch": "neoforge",
-    "minecraft": "1.20.6"
+    "minecraft": "1.20.6",
+    "java": 21
   },
   {
     "branch": "neoforge",
-    "minecraft": "1.21"
+    "minecraft": "1.21",
+    "java": 21
   },
   {
     "branch": "neoforge",
-    "minecraft": "1.21.1"
+    "minecraft": "1.21.1",
+    "java": 21
   },
   {
     "branch": "neoforge",
-    "minecraft": "1.21.2"
+    "minecraft": "1.21.2",
+    "java": 21
   },
   {
     "branch": "neoforge",
-    "minecraft": "1.21.3"
+    "minecraft": "1.21.3",
+    "java": 21
   },
   {
     "branch": "neoforge",
-    "minecraft": "1.21.4"
+    "minecraft": "1.21.4",
+    "java": 21
   },
   {
     "branch": "neoforge",
-    "minecraft": "1.21.5"
+    "minecraft": "1.21.5",
+    "java": 21
   },
   {
     "branch": "neoforge",
-    "minecraft": "1.21.6"
+    "minecraft": "1.21.6",
+    "java": 21
   },
   {
     "branch": "neoforge",
-    "minecraft": "1.21.7"
+    "minecraft": "1.21.7",
+    "java": 21
   },
   {
     "branch": "neoforge",
-    "minecraft": "1.21.8"
+    "minecraft": "1.21.8",
+    "java": 21
+  },
+  {
+    "branch": "neoforge",
+    "minecraft": "1.21.9",
+    "java": 21
+  },
+  {
+    "branch": "neoforge",
+    "minecraft": "26.1",
+    "java": 25
+  },
+  {
+    "branch": "neoforge",
+    "minecraft": "26.1.1",
+    "java": 25
+  },
+  {
+    "branch": "neoforge",
+    "minecraft": "26.1.2",
+    "java": 25
+  },
+  {
+    "branch": "neoforge",
+    "minecraft": "26.2",
+    "java": 25
   }
 ]

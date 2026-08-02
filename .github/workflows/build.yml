@@ -36,14 +36,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # The JVM the Gradle daemon itself runs on, not a compile target - every
+      # target sets its own `options.release`. Minecraft 26 refuses to set up
+      # under anything below 25, and Loom on the older versions has only ever
+      # been exercised on 21, so each target names the one it wants.
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 21
+          java-version: ${{ matrix.target.java }}
 
       - uses: gradle/actions/setup-gradle@v4
 
-      # Retried because Maven Central rate limits us: 79 jobs, each one
+      # Retried because Maven Central rate limits us: 90 jobs, each one
       # fetching its own Minecraft and Forge artifacts from shared runner IPs,
       # and no writable Actions cache on a pull request branch. Some of those
       # downloads are Loom's own rather than Gradle's, so they get no retry or

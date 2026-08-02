@@ -15,15 +15,15 @@ on one.
 
 Every loader and every Minecraft version is built from this one branch.
 
-Every Minecraft release each loader ever shipped for, from 1.14.4 to 1.21.8 —
-80 jars in all.
+Every Minecraft release each loader ever shipped for, from 1.14.4 to 26.2 —
+90 jars in all.
 
 | Loader   | Minecraft versions                                                            |
 |----------|-------------------------------------------------------------------------------|
-| Fabric   | 1.14.4, 1.15–1.15.2, 1.16–1.16.5, 1.17–1.17.1, 1.18–1.18.2, 1.19–1.19.4, 1.20–1.20.6, 1.21–1.21.8 |
+| Fabric   | 1.14.4, 1.15–1.15.2, 1.16–1.16.5, 1.17–1.17.1, 1.18–1.18.2, 1.19–1.19.4, 1.20–1.20.6, 1.21–1.21.11 |
 | Quilt    | same jars as Fabric                                                           |
-| Forge    | 1.14.4, 1.15–1.15.2, 1.16.3–1.16.5, 1.17.1, 1.18–1.18.2, 1.19–1.19.4, 1.20–1.20.4, 1.20.6, 1.21, 1.21.1, 1.21.3–1.21.8 |
-| NeoForge | 1.20.2–1.20.6, 1.21–1.21.8                                                    |
+| Forge    | 1.14.4, 1.15–1.15.2, 1.16.3–1.16.5, 1.17.1, 1.18–1.18.2, 1.19–1.19.4, 1.20–1.20.4, 1.20.6, 1.21, 1.21.1, 1.21.3–1.21.11 |
+| NeoForge | 1.20.2–1.20.6, 1.21–1.21.9, 26.1–26.1.2, 26.2                                 |
 
 Quilt Loader reads `fabric.mod.json` directly, so the Fabric jar *is* the Quilt
 jar — there's nothing extra to build, and releases are tagged for both.
@@ -40,6 +40,15 @@ Architectury Loom this build uses cannot produce them on any Forge build: 1.16.1
 dies remapping Minecraft on a name conflict, and on 1.16.2 the mixin annotation
 processor is given no SRG mappings and so can't write a refmap. Fabric covers
 both versions.
+
+Nothing here ships a refmap any more. Current Loom defaults to
+`useLegacyMixinAp = false`: instead of running Mixin's annotation processor to
+emit a name map alongside the jar, it rewrites the mixin annotations themselves
+into SRG inside `remapJar`. The jars are equivalent — the mapping is in the
+class files rather than in a JSON file next to them — but it means
+`cleancut.mixins.json` must *not* declare a `refmap`, and no build script here
+may add Mixin as an `annotationProcessor`. Doing either points the build at
+mapping data that is never generated.
 
 On Forge 1.14.4, 1.15 and 1.15.1 the mod carries its own copy of Mixin, because
 Forge only started bundling Mixin partway through 1.15.2. See
@@ -65,8 +74,8 @@ the Forge fork from before the rename and still lives under
 `net.minecraftforge`, so the **Forge 1.20.1 jar is the NeoForge 1.20.1 jar** —
 it's the same API, and building it twice would produce the same mod.
 
-1.21.8 is the upper limit for every loader, for the toolchain reason described
-under [Newer Minecraft](#newer-minecraft).
+The ceilings differ per loader — 1.21.11 on Fabric and Forge, 26.2 on NeoForge —
+for the reasons described under [Newer Minecraft](#newer-minecraft).
 
 ## How the repository is laid out
 
@@ -104,11 +113,20 @@ the logic, and a mixin that decides where vanilla gets interrupted.
 ./gradlew :neoforge:1.21.4:build
 ```
 
-Jars land in `<loader>/versions/<version>/build/libs/`. Build with **JDK 21** —
-each target compiles down to the release level its Minecraft version needs, so
-one JDK covers all 82. It has to be 21 and not something newer: this build is on
-Gradle 8, which rejects JDK 25 with `Unsupported class file major version 69`.
-Set `JAVA_HOME` if your default `java` is a later release.
+Jars land in `<loader>/versions/<version>/build/libs/`. Build with **JDK 21**,
+except for the Minecraft 26 targets, which need **JDK 25**:
+
+```sh
+./gradlew :neoforge:26.2:build      # needs JAVA_HOME on a JDK 25
+```
+
+That is the JVM the Gradle daemon runs on, not what the mod compiles against —
+each target sets its own `options.release`, so one daemon covers every release
+level from 8 upwards. Loom refuses to set Minecraft 26 up under anything below
+25 (`Minecraft 26.1 requires Java 25 but Gradle is using 21`), and the older
+targets have only been exercised on 21. `.github/targets.json` carries the
+version each target wants, and CI installs it per job. Set `JAVA_HOME` to
+switch locally.
 
 `./gradlew build` with no arguments builds every target in sequence, which takes
 a while — the per-version Minecraft decompile dominates. CI builds them in
@@ -132,27 +150,44 @@ every target, which is slow — they're for IDE work, not part of building.
 
 ## Newer Minecraft
 
-1.21.8 is where this build stops, and the reason is the toolchain rather than
-the mod. From 1.21.9 Yarn ships unpick v3 data, which needs Fabric Loom 1.17,
-which needs Gradle 9 — and the Gradle wrapper and the Stonecutter version are
-properties of the whole build, not of one branch, so this can't be mixed with
-the Gradle 8 stack the older versions are on.
+This build is on Gradle 9, Stonecutter 0.9 and current Loom, because Minecraft
+26 needs a Java 25 daemon and Gradle 8 cannot run on Java 25 at all — it rejects
+the class files. The wrapper and the Stonecutter version are properties of the
+whole build rather than of one branch, so that migration was all-or-nothing.
 
-Forge and NeoForge do have 1.21.9+ builds, and being Mojang-mapped they never
-touch unpick. They stop at 1.21.8 anyway so that all three loaders cover the
-same range, and because the Architectury Loom pinned here predates those
-versions. Raising their ceiling is a row in the `versionData` table plus
-whatever the compiler then complains about — worth doing on its own, rather
-than mixed into a Gradle 9 migration.
+The obvious worry about moving the whole build forward is that current Loom
+drops the oldest targets, and it very nearly did. Forge 1.14.4, 1.15 and 1.15.1
+— the three that shade their own Mixin — failed with `Unable to locate
+obfuscation mapping for @Redirect target`. The cause was on this side, not
+Loom's: those three added Mixin as an `annotationProcessor` by hand, and current
+Loom no longer passes the processor any mapping arguments because it no longer
+uses the processor. Dropping those lines fixes all three. See the note on
+refmaps under [Supported versions](#supported-versions), and don't reintroduce
+them.
 
-The same wall stands in front of Minecraft's new version scheme (26.1.2 and
-later), which additionally has no Yarn mappings at all and would have to be
-built against Mojang's.
+Every other target from 1.14.4 up builds unchanged, so there is one build here,
+not a legacy one and a modern one.
 
-Getting there means either moving the entire build to Gradle 9, Stonecutter
-0.9 and current Loom — which risks the 1.14-1.16 targets, whose support in
-current Loom is unverified — or keeping this build as it is and adding a
-second, modern Gradle build beside it in the same branch.
+What is left is per-loader, and none of it is a toolchain problem:
+
+**NeoForge skips 1.21.10 and 1.21.11.** From 21.10 its published artifact no
+longer carries `data/server.lzma` where Architectury Loom expects it. The
+packaging moved out from under Loom, so a version bump on this side doesn't fix
+it — building those two means NeoForge's own toolchain instead of Loom, which is
+a different build rather than a different number. It picks back up at 26.1.
+Fabric and Forge cover 1.21.10 and 1.21.11.
+
+**Forge stops at 1.21.11.** On 26.x Loom throws an NPE setting Minecraft up on
+the Forge platform. NeoForge 26.x goes through the same Loom and works, so this
+is Forge-platform-specific.
+
+**Fabric stops at 1.21.11 because 26.x has no Yarn.** Intermediary exists, Yarn
+does not. The Fabric sources here are written in Yarn names, so 26.x on Fabric
+means either Mojang mappings — and the class names in `fabric/src` change
+wholesale, since `MinecraftClient` becomes `Minecraft` and so on — or nothing.
+Forge and NeoForge are already Mojang-mapped and don't have this problem.
+
+Yarn's unpick v3 is *not* a wall, despite an earlier note here saying so.
 
 ## Adding a Minecraft version
 
@@ -160,7 +195,9 @@ second, modern Gradle build beside it in the same branch.
 2. Add a row to that loader's `versionData` table in `<loader>/build.gradle`
    with the mappings or loader build and the Java release level. The dependency
    ranges that go into the mod metadata are derived from those, not written out.
-3. Add it to `.github/targets.json` so CI builds it.
+3. Add it to `.github/targets.json` so CI builds it, with the `java` the Gradle
+   daemon needs for it — 21 for everything so far except Minecraft 26, which
+   needs 25.
 
 Then build it. If an API moved, the compiler will say so, and the fix is another
 `//? if` block around the two alternatives.

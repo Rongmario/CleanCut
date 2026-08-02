@@ -1,7 +1,16 @@
 plugins {
-    id 'dev.architectury.loom' version '1.10-SNAPSHOT'
+    // Minecraft 26 ships unobfuscated, and Loom takes a different plugin for
+    // that - remapping a jar that was never obfuscated is not a no-op, it is a
+    // step that has nothing to work from. Both are declared and one is applied
+    // below, once the version being built is known.
+    id 'dev.architectury.loom' version '1.17.485' apply false
+    id 'dev.architectury.loom-no-remap' version '1.17.485' apply false
     id 'me.modmuss50.mod-publish-plugin' version '2.2.0'
 }
+
+apply plugin: stonecutter.current.version.startsWith('26')
+        ? 'dev.architectury.loom-no-remap'
+        : 'dev.architectury.loom'
 
 // Everything that differs between Minecraft versions on this loader. Adding a
 // version means adding a row here and listing it in settings.gradle.
@@ -25,9 +34,15 @@ def versionData = [
         '1.21.6': [neoforge: '21.6.20-beta', java: 21],  // no stable build
         '1.21.7': [neoforge: '21.7.25-beta', java: 21],  // no stable build
         '1.21.8': [neoforge: '21.8.54', java: 21],
+        '1.21.9': [neoforge: '21.9.16-beta', java: 21],   // no stable build
+        '26.1'  : [neoforge: '26.1.0.19-beta', java: 25],  // no stable build
+        '26.1.1': [neoforge: '26.1.1.15-beta', java: 25],  // no stable build
+        '26.1.2': [neoforge: '26.1.2.93', java: 25],   // .94 has no installer
+        '26.2'  : [neoforge: '26.2.0.41-beta', java: 25],  // no stable build
 ]
 
 def minecraftVersion = stonecutter.current.version
+def unobfuscated = minecraftVersion.startsWith('26')
 def target = versionData[minecraftVersion]
 if (target == null) {
     throw new GradleException("No NeoForge build data for Minecraft ${minecraftVersion}; add a row to neoforge/build.gradle")
@@ -35,7 +50,11 @@ if (target == null) {
 
 // Derived rather than written out per row: the NeoForge range is "this
 // NeoForge line or newer", and the Minecraft range is this version only.
-def neoLine = target.neoforge.tokenize('.')[0..1].join('.')
+// Taken from the Minecraft version rather than NeoForge's own, because the
+// two don't have the same shape: 1.21.8 is NeoForge 21.8.x, three parts, while
+// 26.1.2 is NeoForge 26.1.2.x, four. Dropping Minecraft's leading "1." gives
+// the line in both schemes.
+def neoLine = minecraftVersion.startsWith('1.') ? minecraftVersion.substring(2) : minecraftVersion
 def neoforgeRange = "[${neoLine},)"
 // `loaderVersion` is not that. It is the version of the javafml language
 // provider, which NeoForge numbers on its own line - 1.21.8 ships javafml
@@ -81,7 +100,12 @@ loom {
 
 dependencies {
     minecraft "com.mojang:minecraft:${minecraftVersion}"
-    mappings loom.officialMojangMappings()
+    // Minecraft 26 ships unobfuscated - the jar already carries real names,
+    // and Mojang stopped publishing mappings because nothing is left to map.
+    // Declaring any mappings there is an error, not a no-op.
+    if (!unobfuscated) {
+        mappings loom.officialMojangMappings()
+    }
     neoForge "net.neoforged:neoforge:${target.neoforge}"
 }
 
@@ -126,7 +150,9 @@ jar {
 }
 
 publishMods {
-    file = tasks.remapJar.archiveFile
+    // No remapJar where nothing is obfuscated: the jar off the compiler is
+    // already the jar that ships.
+    file = (unobfuscated ? tasks.jar : tasks.remapJar).archiveFile
     displayName = "${mod_name} ${mod_version} - NeoForge ${minecraftVersion}"
     version = "${mod_version}+${minecraftVersion}-neoforge"
     changelog = providers.environmentVariable('CHANGELOG')

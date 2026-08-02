@@ -66,10 +66,16 @@ public class MinecraftMixin {
         if (entity == null) {
             return null;
         }
+        //? if <26 {
         InteractionResult result = this.gameMode.interactAt(this.player, entity, new EntityHitResult(entity), hand);
         if (!CleanCut.accepted(result)) {
             result = this.gameMode.interact(this.player, entity, hand);
         }
+        //?} else {
+        /*// 26 merged the two: interact now takes the hit result, and the
+        // separate interactAt is gone.
+        InteractionResult result = this.gameMode.interact(this.player, entity, new EntityHitResult(entity), hand);
+        *///?}
         // Anything vanilla would call a hit stops here - the caller swings for
         // us. Anything else falls through to the block we were pointing at.
         return CleanCut.accepted(result) ? InteractionResult.SUCCESS : null;
