@@ -1,7 +1,16 @@
 plugins {
-    id 'dev.architectury.loom' version '1.10-SNAPSHOT'
+    // Minecraft 26 ships unobfuscated, and Loom takes a different plugin for
+    // that - remapping a jar that was never obfuscated is not a no-op, it is a
+    // step that has nothing to work from. Both are declared and one is applied
+    // below, once the version being built is known.
+    id 'dev.architectury.loom' version '1.17.485' apply false
+    id 'dev.architectury.loom-no-remap' version '1.17.485' apply false
     id 'me.modmuss50.mod-publish-plugin' version '2.2.0'
 }
+
+apply plugin: stonecutter.current.version.startsWith('26')
+        ? 'dev.architectury.loom-no-remap'
+        : 'dev.architectury.loom'
 
 // Everything that differs between Minecraft versions on this loader. Adding a
 // version means adding a row here and listing it in settings.gradle.
@@ -51,9 +60,14 @@ def versionData = [
         '1.21.9': [forge: '1.21.9-59.0.5', java: 21],
         '1.21.10': [forge: '1.21.10-60.1.13', java: 21],
         '1.21.11': [forge: '1.21.11-61.1.14', java: 21],
+        '26.1'  : [forge: '26.1-62.0.9', java: 25],
+        '26.1.1': [forge: '26.1.1-63.0.2', java: 25],
+        '26.1.2': [forge: '26.1.2-64.1.0', java: 25],
+        '26.2'  : [forge: '26.2-65.1.0', java: 25],
 ]
 
 def minecraftVersion = stonecutter.current.version
+def unobfuscated = minecraftVersion.startsWith('26')
 def target = versionData[minecraftVersion]
 if (target == null) {
     throw new GradleException("No Forge build data for Minecraft ${minecraftVersion}; add a row to forge/build.gradle")
@@ -112,19 +126,29 @@ configurations {
 
 loom {
     silentMojangMappingsLicense()
-    mixin {
-        // Must match the "refmap" entry in cleancut.mixins.json - Forge reads
-        // the name from the config rather than having it injected.
-        defaultRefmapName = "${mod_id}.refmap.json"
-    }
-    forge {
-        mixinConfig "${mod_id}.mixins.json"
+    // A refmap maps mixin targets back to obfuscated names. With nothing
+    // obfuscated there is nothing to map, and the no-remap plugin fixes these
+    // properties before the build script runs.
+    if (!unobfuscated) {
+        mixin {
+            // Must match the "refmap" entry in cleancut.mixins.json - Forge
+            // reads the name from the config rather than having it injected.
+            defaultRefmapName = "${mod_id}.refmap.json"
+        }
+        forge {
+            mixinConfig "${mod_id}.mixins.json"
+        }
     }
 }
 
 dependencies {
     minecraft "com.mojang:minecraft:${minecraftVersion}"
-    mappings loom.officialMojangMappings()
+    // Minecraft 26 ships unobfuscated - the jar already carries real names,
+    // and Mojang stopped publishing mappings because nothing is left to map.
+    // Declaring any mappings there is an error, not a no-op.
+    if (!unobfuscated) {
+        mappings loom.officialMojangMappings()
+    }
     forge "net.minecraftforge:forge:${target.forge}"
 
     if (shadesMixin) {
@@ -136,6 +160,11 @@ dependencies {
         // otherwise start up and immediately fail on NoClassDefFoundError.
         annotationProcessor 'com.google.code.gson:gson:2.8.9'
         annotationProcessor 'com.google.guava:guava:31.1-jre'
+        // Same reason, and newly needed: Loom used to leave ASM on the
+        // processor's class path and no longer does. This one is the build's
+        // own ASM, unrelated to the copy shaded for runtime below - it only
+        // has to read the class files of the version being built.
+        annotationProcessor 'org.ow2.asm:asm-tree:9.9'
         shaded "org.spongepowered:mixin:${mixinVersion}"
         // Just asm-util, not the ASM it was built against - taking its
         // transitives would put a whole second copy of ASM in the jar.
@@ -216,7 +245,9 @@ jar {
 }
 
 publishMods {
-    file = tasks.remapJar.archiveFile
+    // No remapJar where nothing is obfuscated: the jar off the compiler is
+    // already the jar that ships.
+    file = (unobfuscated ? tasks.jar : tasks.remapJar).archiveFile
     displayName = "${mod_name} ${mod_version} - Forge ${minecraftVersion}"
     version = "${mod_version}+${minecraftVersion}-forge"
     changelog = providers.environmentVariable('CHANGELOG')

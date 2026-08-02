@@ -1,7 +1,16 @@
 plugins {
-    id 'fabric-loom' version '1.13.6'
+    // Minecraft 26 ships unobfuscated, and Fabric Loom has no mode for that -
+    // it requires a mappings dependency that no longer exists for those
+    // versions. Architectury Loom's no-remap plugin does, and it drives the
+    // Fabric platform as well as the other two.
+    id 'fabric-loom' version '1.17.17' apply false
+    id 'dev.architectury.loom-no-remap' version '1.17.485' apply false
     id 'me.modmuss50.mod-publish-plugin' version '2.2.0'
 }
+
+apply plugin: stonecutter.current.version.startsWith('26')
+        ? 'dev.architectury.loom-no-remap'
+        : 'fabric-loom'
 
 // Everything that differs between Minecraft versions on this loader. Adding a
 // version means adding a row here and listing it in settings.gradle.
@@ -47,9 +56,11 @@ def versionData = [
         '1.21.9' : [mappings: '1.21.9+build.1', java: 21],
         '1.21.10': [mappings: '1.21.10+build.3', java: 21],
         '1.21.11': [mappings: '1.21.11+build.6', java: 21],
+        '26.2'   : [mappings: null, java: 25],
 ]
 
 def minecraftVersion = stonecutter.current.version
+def unobfuscated = minecraftVersion.startsWith('26')
 def target = versionData[minecraftVersion]
 if (target == null) {
     throw new GradleException("No Fabric build data for Minecraft ${minecraftVersion}; add a row to fabric/build.gradle")
@@ -64,8 +75,20 @@ base {
 
 dependencies {
     minecraft "com.mojang:minecraft:${minecraftVersion}"
-    mappings "net.fabricmc:yarn:${target.mappings}:v2"
-    modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+    // Minecraft 26 is unobfuscated: no Yarn, no Mojang mappings, nothing to
+    // declare. Yarn existed to give obfuscated names meaning, and the names
+    // now come in the jar.
+    if (target.mappings != null) {
+        mappings "net.fabricmc:yarn:${target.mappings}:v2"
+    }
+    // modImplementation exists to remap a dependency out of intermediary on
+    // the way in. With nothing obfuscated the no-remap plugin doesn't register
+    // it, and a plain dependency is already the right thing.
+    if (unobfuscated) {
+        implementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+    } else {
+        modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+    }
 }
 
 processResources {
@@ -103,7 +126,9 @@ jar {
 }
 
 publishMods {
-    file = tasks.remapJar.archiveFile
+    // No remapJar where nothing is obfuscated: the jar off the compiler is
+    // already the jar that ships.
+    file = (unobfuscated ? tasks.jar : tasks.remapJar).archiveFile
     displayName = "${mod_name} ${mod_version} - Fabric ${minecraftVersion}"
     version = "${mod_version}+${minecraftVersion}-fabric"
     changelog = providers.environmentVariable('CHANGELOG')

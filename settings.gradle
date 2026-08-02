@@ -22,7 +22,7 @@ pluginManagement {
 }
 
 plugins {
-    id 'dev.kikugie.stonecutter' version '0.7.11'
+    id 'dev.kikugie.stonecutter' version '0.9.7'
 }
 
 // One branch per mod loader, one version per supported Minecraft release.
@@ -47,8 +47,9 @@ stonecutter {
                     '1.21', '1.21.1', '1.21.2', '1.21.3', '1.21.4', '1.21.5',
                     '1.21.6', '1.21.7', '1.21.8',
                     '1.21.9', '1.21.10', '1.21.11'
-                    // 26.1 and later have no Yarn at all - see "Newer
-                    // Minecraft" in README.md.
+                    // 26.x builds as far as the compiler on this branch, but
+                    // these sources are Yarn-named and 26 is Mojang-named.
+                    // See "Newer Minecraft" in README.md.
             )
         }
 
@@ -68,8 +69,8 @@ stonecutter {
                     '1.21', '1.21.1', '1.21.3', '1.21.4', '1.21.5',
                     '1.21.6', '1.21.7', '1.21.8',
                     '1.21.9', '1.21.10', '1.21.11'
-                    // 26.1 and later need Java 25. See "Newer Minecraft" in
-                    // README.md.
+                    // 26.x: Loom throws an NPE setting Minecraft up on the
+                    // Forge platform. NeoForge 26.x works.
             )
         }
 
@@ -81,10 +82,10 @@ stonecutter {
                     '1.20.2', '1.20.3', '1.20.4', '1.20.5', '1.20.6',
                     '1.21', '1.21.1', '1.21.2', '1.21.3', '1.21.4', '1.21.5',
                     '1.21.6', '1.21.7', '1.21.8',
-                    '1.21.9'
-                    // 1.21.10 and later are packaged in a way this Loom can't
-                    // read; 26.1 and later need Java 25. See "Newer Minecraft"
-                    // in README.md.
+                    '1.21.9',
+                    // 1.21.10 and 1.21.11 are packaged in a way this Loom
+                    // can't read - see "Newer Minecraft" in README.md.
+                    '26.1', '26.1.1', '26.1.2', '26.2'
             )
         }
 

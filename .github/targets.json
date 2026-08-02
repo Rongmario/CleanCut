@@ -342,5 +342,21 @@
   {
     "branch": "neoforge",
     "minecraft": "1.21.9"
+  },
+  {
+    "branch": "neoforge",
+    "minecraft": "26.1"
+  },
+  {
+    "branch": "neoforge",
+    "minecraft": "26.1.1"
+  },
+  {
+    "branch": "neoforge",
+    "minecraft": "26.1.2"
+  },
+  {
+    "branch": "neoforge",
+    "minecraft": "26.2"
   }
 ]
