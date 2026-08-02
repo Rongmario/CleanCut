@@ -32,9 +32,9 @@ stonecutter {
     create(rootProject) {
         centralScript.set('build.gradle')
 
-        // Every Minecraft release each loader ever shipped for, from 1.14.4 up
-        // to the 1.21.8 ceiling. Gaps are releases that loader skipped, not
-        // omissions - see the tables in <branch>/build.gradle.
+        // Every Minecraft release each loader ever shipped for, from 1.14.4
+        // up. Gaps are releases that loader skipped, not omissions - see the
+        // tables in <branch>/build.gradle.
         branch('fabric') { fabric ->
             fabric.versions(
                     '1.14.4',
@@ -45,9 +45,10 @@ stonecutter {
                     '1.19', '1.19.1', '1.19.2', '1.19.3', '1.19.4',
                     '1.20', '1.20.1', '1.20.2', '1.20.3', '1.20.4', '1.20.5', '1.20.6',
                     '1.21', '1.21.1', '1.21.2', '1.21.3', '1.21.4', '1.21.5',
-                    '1.21.6', '1.21.7', '1.21.8'
-                    // 1.21.9+ needs Yarn's unpick v3, which needs Loom 1.17,
-                    // which needs Gradle 9. See "Newer Minecraft" in README.md.
+                    '1.21.6', '1.21.7', '1.21.8',
+                    '1.21.9', '1.21.10', '1.21.11'
+                    // 26.1 and later have no Yarn at all - see "Newer
+                    // Minecraft" in README.md.
             )
         }
 
@@ -65,7 +66,10 @@ stonecutter {
                     '1.19', '1.19.1', '1.19.2', '1.19.3', '1.19.4',
                     '1.20', '1.20.1', '1.20.2', '1.20.4', '1.20.6',
                     '1.21', '1.21.1', '1.21.3', '1.21.4', '1.21.5',
-                    '1.21.6', '1.21.7', '1.21.8'
+                    '1.21.6', '1.21.7', '1.21.8',
+                    '1.21.9', '1.21.10', '1.21.11'
+                    // 26.1 and later need Java 25. See "Newer Minecraft" in
+                    // README.md.
             )
         }
 
@@ -76,7 +80,11 @@ stonecutter {
             neoforge.versions(
                     '1.20.2', '1.20.3', '1.20.4', '1.20.5', '1.20.6',
                     '1.21', '1.21.1', '1.21.2', '1.21.3', '1.21.4', '1.21.5',
-                    '1.21.6', '1.21.7', '1.21.8'
+                    '1.21.6', '1.21.7', '1.21.8',
+                    '1.21.9'
+                    // 1.21.10 and later are packaged in a way this Loom can't
+                    // read; 26.1 and later need Java 25. See "Newer Minecraft"
+                    // in README.md.
             )
         }
 

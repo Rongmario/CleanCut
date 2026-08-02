@@ -15,15 +15,15 @@ on one.
 
 Every loader and every Minecraft version is built from this one branch.
 
-Every Minecraft release each loader ever shipped for, from 1.14.4 to 1.21.8 —
-80 jars in all.
+Every Minecraft release each loader ever shipped for, from 1.14.4 to 1.21.11 —
+86 jars in all.
 
 | Loader   | Minecraft versions                                                            |
 |----------|-------------------------------------------------------------------------------|
-| Fabric   | 1.14.4, 1.15–1.15.2, 1.16–1.16.5, 1.17–1.17.1, 1.18–1.18.2, 1.19–1.19.4, 1.20–1.20.6, 1.21–1.21.8 |
+| Fabric   | 1.14.4, 1.15–1.15.2, 1.16–1.16.5, 1.17–1.17.1, 1.18–1.18.2, 1.19–1.19.4, 1.20–1.20.6, 1.21–1.21.11 |
 | Quilt    | same jars as Fabric                                                           |
-| Forge    | 1.14.4, 1.15–1.15.2, 1.16.3–1.16.5, 1.17.1, 1.18–1.18.2, 1.19–1.19.4, 1.20–1.20.4, 1.20.6, 1.21, 1.21.1, 1.21.3–1.21.8 |
-| NeoForge | 1.20.2–1.20.6, 1.21–1.21.8                                                    |
+| Forge    | 1.14.4, 1.15–1.15.2, 1.16.3–1.16.5, 1.17.1, 1.18–1.18.2, 1.19–1.19.4, 1.20–1.20.4, 1.20.6, 1.21, 1.21.1, 1.21.3–1.21.11 |
+| NeoForge | 1.20.2–1.20.6, 1.21–1.21.9                                                    |
 
 Quilt Loader reads `fabric.mod.json` directly, so the Fabric jar *is* the Quilt
 jar — there's nothing extra to build, and releases are tagged for both.
@@ -132,27 +132,39 @@ every target, which is slow — they're for IDE work, not part of building.
 
 ## Newer Minecraft
 
-1.21.8 is where this build stops, and the reason is the toolchain rather than
-the mod. From 1.21.9 Yarn ships unpick v3 data, which needs Fabric Loom 1.17,
-which needs Gradle 9 — and the Gradle wrapper and the Stonecutter version are
-properties of the whole build, not of one branch, so this can't be mixed with
-the Gradle 8 stack the older versions are on.
+The ceiling is 1.21.11 on Fabric and Forge, and 1.21.9 on NeoForge. Three
+separate walls sit past that, and they are not the same wall.
 
-Forge and NeoForge do have 1.21.9+ builds, and being Mojang-mapped they never
-touch unpick. They stop at 1.21.8 anyway so that all three loaders cover the
-same range, and because the Architectury Loom pinned here predates those
-versions. Raising their ceiling is a row in the `versionData` table plus
-whatever the compiler then complains about — worth doing on its own, rather
-than mixed into a Gradle 9 migration.
+**NeoForge stops at 1.21.9.** From 21.10 its published artifact no longer
+carries `data/server.lzma` where Architectury Loom expects it, on both Loom
+1.10 and 1.11. The packaging moved out from under Loom rather than Loom falling
+behind, so a version bump on this side doesn't fix it — building 21.10+ means
+NeoForge's own toolchain instead of Loom, which is a different build, not a
+different number. Fabric and Forge still cover 1.21.10 and 1.21.11.
 
-The same wall stands in front of Minecraft's new version scheme (26.1.2 and
-later), which additionally has no Yarn mappings at all and would have to be
-built against Mojang's.
+**26.1 and later need Java 25.** Loom refuses outright: `Minecraft 26.1
+requires Java 25 but Gradle is using 21`. Gradle 8 cannot itself run on Java 25
+— it rejects the class files — so this is a Gradle 9 migration, and it applies
+to all three loaders at once. That is the real cost of the new version scheme,
+and it lands before any mod code is even looked at.
 
-Getting there means either moving the entire build to Gradle 9, Stonecutter
-0.9 and current Loom — which risks the 1.14-1.16 targets, whose support in
-current Loom is unverified — or keeping this build as it is and adding a
-second, modern Gradle build beside it in the same branch.
+**Fabric additionally has no Yarn for 26.x.** Intermediary exists, Yarn does
+not. The Fabric sources here are written in Yarn names, so 26.x on Fabric means
+either Mojang mappings — and the class names in `fabric/src` change wholesale,
+since `MinecraftClient` becomes `Minecraft` and so on — or nothing. Forge and
+NeoForge are already Mojang-mapped and don't have this problem.
+
+26.3-snapshot-6 has no Forge or NeoForge build at all yet, so it is Fabric-only
+even after the above.
+
+What is *not* a wall, despite an earlier note here saying so: Yarn's unpick v3.
+Loom 1.13.6 reads it on Gradle 8 quite happily, which is what got 1.21.9 to
+1.21.11 built. Loom 1.16 and later are the ones that demand Gradle 9.
+
+Getting to 26.x means moving the build to Gradle 9, Stonecutter 0.9 and current
+Loom, on a Java 25 daemon — which risks the 1.14–1.16 targets, whose support in
+current Loom is unverified — or keeping this build as it is and adding a second,
+modern one beside it in the same branch.
 
 ## Adding a Minecraft version
 

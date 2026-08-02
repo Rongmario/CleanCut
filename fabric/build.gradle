@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.10-SNAPSHOT'
+    id 'fabric-loom' version '1.13.6'
     id 'me.modmuss50.mod-publish-plugin' version '2.2.0'
 }
 
@@ -44,6 +44,9 @@ def versionData = [
         '1.21.6': [mappings: '1.21.6+build.1', java: 21],
         '1.21.7': [mappings: '1.21.7+build.8', java: 21],
         '1.21.8': [mappings: '1.21.8+build.1', java: 21],
+        '1.21.9' : [mappings: '1.21.9+build.1', java: 21],
+        '1.21.10': [mappings: '1.21.10+build.3', java: 21],
+        '1.21.11': [mappings: '1.21.11+build.6', java: 21],
 ]
 
 def minecraftVersion = stonecutter.current.version

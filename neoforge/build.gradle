@@ -25,6 +25,11 @@ def versionData = [
         '1.21.6': [neoforge: '21.6.20-beta', java: 21],  // no stable build
         '1.21.7': [neoforge: '21.7.25-beta', java: 21],  // no stable build
         '1.21.8': [neoforge: '21.8.54', java: 21],
+        '1.21.9': [neoforge: '21.9.16-beta', java: 21],   // no stable build
+        // NeoForge stops here, at 21.9. From 21.10 its artifact no longer
+        // carries data/server.lzma where Architectury Loom looks for it, on
+        // both 1.10 and 1.11 - the packaging moved out from under Loom, and
+        // this is not something a version bump on our side fixes.
 ]
 
 def minecraftVersion = stonecutter.current.version
@@ -35,7 +40,11 @@ if (target == null) {
 
 // Derived rather than written out per row: the NeoForge range is "this
 // NeoForge line or newer", and the Minecraft range is this version only.
-def neoLine = target.neoforge.tokenize('.')[0..1].join('.')
+// Taken from the Minecraft version rather than NeoForge's own, because the
+// two don't have the same shape: 1.21.8 is NeoForge 21.8.x, three parts, while
+// 26.1.2 is NeoForge 26.1.2.x, four. Dropping Minecraft's leading "1." gives
+// the line in both schemes.
+def neoLine = minecraftVersion.startsWith('1.') ? minecraftVersion.substring(2) : minecraftVersion
 def neoforgeRange = "[${neoLine},)"
 // `loaderVersion` is not that. It is the version of the javafml language
 // provider, which NeoForge numbers on its own line - 1.21.8 ships javafml
