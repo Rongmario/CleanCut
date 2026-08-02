@@ -126,15 +126,16 @@ configurations {
 
 loom {
     silentMojangMappingsLicense()
-    // A refmap maps mixin targets back to obfuscated names. With nothing
-    // obfuscated there is nothing to map, and the no-remap plugin fixes these
-    // properties before the build script runs.
+    // No refmap anywhere in here, on any version. A refmap maps mixin targets
+    // back to obfuscated names, and this Loom doesn't produce one: it defaults
+    // to `useLegacyMixinAp = false` and rewrites the annotations themselves
+    // into SRG inside remapJar. Declaring one in cleancut.mixins.json would
+    // just point Mixin at a file the build never writes.
+    //
+    // mixinConfig still matters - it puts the config in the jar manifest,
+    // which is how Forge finds it. The no-remap plugin used for Minecraft 26
+    // sets that up itself before this script runs.
     if (!unobfuscated) {
-        mixin {
-            // Must match the "refmap" entry in cleancut.mixins.json - Forge
-            // reads the name from the config rather than having it injected.
-            defaultRefmapName = "${mod_id}.refmap.json"
-        }
         forge {
             mixinConfig "${mod_id}.mixins.json"
         }
@@ -152,19 +153,17 @@ dependencies {
     forge "net.minecraftforge:forge:${target.forge}"
 
     if (shadesMixin) {
-        // Compile against Mixin and run the annotation processor over it, so
-        // the refmap still gets generated, then put Mixin in the jar.
+        // Compile against Mixin, then put it in the jar.
+        //
+        // Deliberately no `annotationProcessor` for Mixin here. This Loom runs
+        // with `useLegacyMixinAp = false`: it rewrites mixin annotations into
+        // SRG names inside remapJar instead of having Mixin's processor emit a
+        // refmap. Adding the processor by hand puts it on the compile path
+        // without any of the mapping arguments Loom used to pass with it, and
+        // it then fails outright with "Unable to locate obfuscation mapping
+        // for @Redirect target". Every other Forge version here already builds
+        // through the remapper; these three are no different.
         compileOnly "org.spongepowered:mixin:${mixinVersion}"
-        annotationProcessor "org.spongepowered:mixin:${mixinVersion}"
-        // Mixin's POM marks these provided, so the annotation processor would
-        // otherwise start up and immediately fail on NoClassDefFoundError.
-        annotationProcessor 'com.google.code.gson:gson:2.8.9'
-        annotationProcessor 'com.google.guava:guava:31.1-jre'
-        // Same reason, and newly needed: Loom used to leave ASM on the
-        // processor's class path and no longer does. This one is the build's
-        // own ASM, unrelated to the copy shaded for runtime below - it only
-        // has to read the class files of the version being built.
-        annotationProcessor 'org.ow2.asm:asm-tree:9.9'
         shaded "org.spongepowered:mixin:${mixinVersion}"
         // Just asm-util, not the ASM it was built against - taking its
         // transitives would put a whole second copy of ASM in the jar.

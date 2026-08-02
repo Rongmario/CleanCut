@@ -55,10 +55,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Per-target, for the same reason as the build workflow: Minecraft 26
+      # needs a Java 25 daemon, the rest are built on 21.
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 21
+          java-version: ${{ matrix.target.java }}
 
       - uses: gradle/actions/setup-gradle@v4
 
