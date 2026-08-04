@@ -38,7 +38,8 @@ def versionData = [
         '26.1'  : [neoforge: '26.1.0.19-beta', java: 25],  // no stable build
         '26.1.1': [neoforge: '26.1.1.15-beta', java: 25],  // no stable build
         '26.1.2': [neoforge: '26.1.2.93', java: 25],   // .94 has no installer
-        '26.2'  : [neoforge: '26.2.0.41-beta', java: 25],  // no stable build
+        '26.2'  : [neoforge: '26.2.0.48-beta', java: 25],  // no stable build
+        // No 26.3 row: NeoForge has published nothing for that line yet.
 ]
 
 def minecraftVersion = stonecutter.current.version
@@ -54,7 +55,11 @@ if (target == null) {
 // two don't have the same shape: 1.21.8 is NeoForge 21.8.x, three parts, while
 // 26.1.2 is NeoForge 26.1.2.x, four. Dropping Minecraft's leading "1." gives
 // the line in both schemes.
+// A snapshot id carries a suffix that is no part of either scheme's numbering
+// - NeoForge spells its snapshot builds 26.1.0.0-alpha.11+snapshot-7, with the
+// line still numeric - so the line is what's left before the dash.
 def neoLine = minecraftVersion.startsWith('1.') ? minecraftVersion.substring(2) : minecraftVersion
+neoLine = neoLine.split('-', 2)[0]
 def neoforgeRange = "[${neoLine},)"
 // `loaderVersion` is not that. It is the version of the javafml language
 // provider, which NeoForge numbers on its own line - 1.21.8 ships javafml
@@ -63,7 +68,13 @@ def neoforgeRange = "[${neoLine},)"
 // Anything from 1 up, as NeoForge's own template does; the real constraint is
 // the neoforge dependency, which is versioned properly.
 def languageRange = '[1,)'
+// The upper bound of "this Minecraft version only". A snapshot is already the
+// tail of its line, so the bound is the line itself: 26.3-snapshot-7 is below
+// 26.3, and stops there.
 def nextMinecraft = { String mc ->
+    if (mc.contains('-')) {
+        return mc.split('-', 2)[0]
+    }
     def parts = mc.tokenize('.')
     while (parts.size() < 3) {
         parts << '0'

@@ -47,7 +47,7 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
-      # Retried because Maven Central rate limits us: 90 jobs, each one
+      # Retried because Maven Central rate limits us: 95 jobs, each one
       # fetching its own Minecraft and Forge artifacts from shared runner IPs,
       # and no writable Actions cache on a pull request branch. Some of those
       # downloads are Loom's own rather than Gradle's, so they get no retry or

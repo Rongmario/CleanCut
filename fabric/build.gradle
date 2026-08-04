@@ -14,8 +14,10 @@ apply plugin: stonecutter.current.version.startsWith('26')
 
 // Everything that differs between Minecraft versions on this loader. Adding a
 // version means adding a row here and listing it in settings.gradle.
-// `mappings` is the Yarn build; `java` is the release level that version of
-// Minecraft compiles against.
+// `mappings` is the Yarn build - null from 26, which ships unobfuscated and so
+// has no Yarn at all. `java` is the release level that version of Minecraft
+// compiles against. `loader` overrides the Fabric Loader in gradle.properties
+// for versions that one is too old for.
 def versionData = [
         '1.14.4': [mappings: '1.14.4+build.18', java: 8],
         '1.15'  : [mappings: '1.15+build.2', java: 8],
@@ -56,7 +58,13 @@ def versionData = [
         '1.21.9' : [mappings: '1.21.9+build.1', java: 21],
         '1.21.10': [mappings: '1.21.10+build.3', java: 21],
         '1.21.11': [mappings: '1.21.11+build.6', java: 21],
-        '26.2'   : [mappings: null, java: 25],
+        // Minecraft 26: no Yarn, and a Fabric Loader from the same era as the
+        // game rather than the one the 1.x targets are built against.
+        '26.1'   : [mappings: null, java: 25, loader: '0.19.3'],
+        '26.1.1' : [mappings: null, java: 25, loader: '0.19.3'],
+        '26.1.2' : [mappings: null, java: 25, loader: '0.19.3'],
+        '26.2'   : [mappings: null, java: 25, loader: '0.19.3'],
+        '26.3-snapshot-7': [mappings: null, java: 25, loader: '0.19.3'],
 ]
 
 def minecraftVersion = stonecutter.current.version
@@ -65,6 +73,16 @@ def target = versionData[minecraftVersion]
 if (target == null) {
     throw new GradleException("No Fabric build data for Minecraft ${minecraftVersion}; add a row to fabric/build.gradle")
 }
+
+def loaderVersion = target.loader ?: fabric_loader_version
+
+// Fabric Loader doesn't go by Minecraft's own version id. It normalises it into
+// Fabric's extended semver first, and snapshots lose Mojang's spelling on the
+// way: 26.3-snapshot-7 is 26.3-alpha.7 to the loader. A dependency written the
+// Mojang way would never match the game it was built for.
+def snapshot = (minecraftVersion =~ /^(\d+(?:\.\d+)*)-snapshot-(\d+)$/)
+def isSnapshot = snapshot.matches()
+def loaderMinecraftVersion = isSnapshot ? "${snapshot.group(1)}-alpha.${snapshot.group(2)}" : minecraftVersion
 
 version = "${mod_version}+${minecraftVersion}"
 group = mod_group
@@ -85,9 +103,9 @@ dependencies {
     // the way in. With nothing obfuscated the no-remap plugin doesn't register
     // it, and a plain dependency is already the right thing.
     if (unobfuscated) {
-        implementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+        implementation "net.fabricmc:fabric-loader:${loaderVersion}"
     } else {
-        modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+        modImplementation "net.fabricmc:fabric-loader:${loaderVersion}"
     }
 }
 
@@ -102,7 +120,7 @@ processResources {
             mod_homepage         : mod_homepage,
             mod_sources          : mod_sources,
             mod_issues           : mod_issues,
-            minecraft_dependency : "~${minecraftVersion}",
+            minecraft_dependency : "~${loaderMinecraftVersion}",
             mixin_compat         : "JAVA_${target.java}",
     ]
     inputs.properties(properties)
@@ -133,7 +151,8 @@ publishMods {
     version = "${mod_version}+${minecraftVersion}-fabric"
     changelog = providers.environmentVariable('CHANGELOG')
             .orElse("See ${mod_sources}/releases".toString())
-    type = STABLE
+    // A build for a Minecraft snapshot is only as stable as the snapshot.
+    type = isSnapshot ? ALPHA : STABLE
     modLoaders.add('fabric')
     // Quilt Loader reads fabric.mod.json directly, so the Fabric jar is the
     // Quilt jar. Nothing extra to build, but it gets tagged for Quilt users.
@@ -148,7 +167,10 @@ publishMods {
         }
     }
 
-    if (curseforge_id) {
+    // Modrinth carries Minecraft snapshots as game versions of their own;
+    // CurseForge doesn't, so a snapshot build has nowhere to go there and the
+    // upload would be rejected for an unknown version. Modrinth-only for those.
+    if (curseforge_id && !isSnapshot) {
         curseforge {
             projectId = curseforge_id
             accessToken = providers.environmentVariable('CURSEFORGE_TOKEN')

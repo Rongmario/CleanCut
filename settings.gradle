@@ -46,10 +46,11 @@ stonecutter {
                     '1.20', '1.20.1', '1.20.2', '1.20.3', '1.20.4', '1.20.5', '1.20.6',
                     '1.21', '1.21.1', '1.21.2', '1.21.3', '1.21.4', '1.21.5',
                     '1.21.6', '1.21.7', '1.21.8',
-                    '1.21.9', '1.21.10', '1.21.11'
-                    // 26.x builds as far as the compiler on this branch, but
-                    // these sources are Yarn-named and 26 is Mojang-named.
-                    // See "Newer Minecraft" in README.md.
+                    '1.21.9', '1.21.10', '1.21.11',
+                    // From 26 the game ships unobfuscated, so there is no Yarn
+                    // and the sources switch to Mojang names. 26.3-snapshot-7
+                    // is the current snapshot; older ones aren't kept.
+                    '26.1', '26.1.1', '26.1.2', '26.2', '26.3-snapshot-7'
             )
         }
 
@@ -86,6 +87,9 @@ stonecutter {
                     // 1.21.10 and 1.21.11 are packaged in a way this Loom
                     // can't read - see "Newer Minecraft" in README.md.
                     '26.1', '26.1.1', '26.1.2', '26.2'
+                    // No 26.3 yet: NeoForge has published nothing for it, not
+                    // even a snapshot build. Run the "Loader builds" workflow
+                    // against 26.3-snapshot-7 to check whether that changed.
             )
         }
 
