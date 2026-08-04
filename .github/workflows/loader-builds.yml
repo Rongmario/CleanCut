@@ -1,0 +1,66 @@
+name: Loader builds
+
+# Adding a Minecraft version means writing an upstream build number into a
+# `versionData` table by hand - a Yarn build for Fabric, a Forge or NeoForge
+# build for the other two. This job reads them off the upstream repositories so
+# the numbers come from somewhere checkable instead of from memory.
+#
+# Run it from the Actions tab with the Minecraft version you're adding.
+on:
+  workflow_dispatch:
+    inputs:
+      minecraft:
+        description: Minecraft version to look up, e.g. 26.2 or 26.3-snapshot-7
+        required: true
+        type: string
+
+jobs:
+  lookup:
+    name: ${{ inputs.minecraft }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Minecraft
+        run: |
+          curl -sSf https://piston-meta.mojang.com/mc/game/version_manifest_v2.json > manifest.json
+          jq -r --arg v "${{ inputs.minecraft }}" '
+            .versions[] | select(.id == $v)
+            | "id \(.id)  type \(.type)  released \(.releaseTime)"
+          ' manifest.json
+          echo "--- newest 10 known to Mojang"
+          jq -r '.versions[:10][] | "\(.id)\t\(.type)"' manifest.json
+
+      - name: Fabric
+        run: |
+          echo "--- loader (newest 5)"
+          curl -sSf https://meta.fabricmc.net/v2/versions/loader \
+            | jq -r '.[:5][] | "\(.version)\tstable=\(.stable)"'
+          echo "--- game entry"
+          curl -sSf https://meta.fabricmc.net/v2/versions/game \
+            | jq -r --arg v "${{ inputs.minecraft }}" '.[] | select(.version == $v)'
+          echo "--- yarn builds (newest 5 for this version)"
+          curl -sSf "https://meta.fabricmc.net/v2/versions/yarn/${{ inputs.minecraft }}" \
+            | jq -r '.[:5][] | .version' || echo "no Yarn for this version"
+          echo "--- intermediary"
+          curl -sSf "https://meta.fabricmc.net/v2/versions/intermediary/${{ inputs.minecraft }}" \
+            | jq -r '.[] | .maven' || echo "no intermediary for this version"
+
+      # NeoForge's version number encodes the Minecraft one: 1.21.8 is 21.8.x,
+      # 26.2 is 26.2.0.x, and a snapshot build carries +snapshot-N. Dropping
+      # Minecraft's leading "1." and its snapshot suffix gives the prefix to
+      # grep for in either scheme.
+      - name: NeoForge
+        run: |
+          mc="${{ inputs.minecraft }}"
+          line="${mc#1.}"
+          line="${line%%-*}"
+          curl -sSf https://maven.neoforged.net/releases/net/neoforged/neoforge/maven-metadata.xml > neoforge.xml
+          echo "--- builds for ${line}"
+          grep -oP '(?<=<version>)[^<]+' neoforge.xml | grep "^${line}\." || echo "none"
+          echo "--- newest 5 overall"
+          grep -oP '(?<=<version>)[^<]+' neoforge.xml | tail -5
+
+      - name: Forge
+        run: |
+          curl -sSf https://maven.minecraftforge.net/net/minecraftforge/forge/maven-metadata.xml > forge.xml
+          echo "--- builds for ${{ inputs.minecraft }}"
+          grep -oP '(?<=<version>)[^<]+' forge.xml | grep "^${{ inputs.minecraft }}-" || echo "none"
