@@ -5,9 +5,6 @@ name: Build
 # `pull_request` trigger; `push` only watches the branch nothing opens a pull
 # request against.
 on:
-  push:
-    branches: [master]
-  pull_request:
   workflow_dispatch:
 
 jobs:
