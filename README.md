@@ -15,12 +15,12 @@ on one.
 
 Every loader and every Minecraft version is built from this one branch.
 
-Every Minecraft release each loader ever shipped for, from 1.14.4 to the
-current snapshot — 95 jars in all.
+Every Minecraft release each loader ever shipped for, from 1.14.4 to 26.3,
+with 95 jars in all.
 
 | Loader   | Minecraft versions                                                            |
 |----------|-------------------------------------------------------------------------------|
-| Fabric   | 1.14.4, 1.15–1.15.2, 1.16–1.16.5, 1.17–1.17.1, 1.18–1.18.2, 1.19–1.19.4, 1.20–1.20.6, 1.21–1.21.11, 26.1–26.1.2, 26.2, 26.3-snapshot-7 |
+| Fabric   | 1.14.4, 1.15–1.15.2, 1.16–1.16.5, 1.17–1.17.1, 1.18–1.18.2, 1.19–1.19.4, 1.20–1.20.6, 1.21–1.21.11, 26.1–26.1.2, 26.2–26.3 |
 | Quilt    | same jars as Fabric                                                           |
 | Forge    | 1.14.4, 1.15–1.15.2, 1.16.3–1.16.5, 1.17.1, 1.18–1.18.2, 1.19–1.19.4, 1.20–1.20.4, 1.20.6, 1.21, 1.21.1, 1.21.3–1.21.11 |
 | NeoForge | 1.20.2–1.20.6, 1.21–1.21.9, 26.1–26.1.2, 26.2                                 |
@@ -78,8 +78,8 @@ Only one snapshot is carried at a time, the current one. When the next lands,
 the row moves rather than accumulating — a snapshot nobody can download any
 more is not worth a build job.
 
-The ceilings differ per loader — 1.21.11 on Forge, 26.2 on NeoForge, the
-current snapshot on Fabric — for the reasons described under
+The ceilings differ per loader — 1.21.11 on Forge, 26.2 on NeoForge, and 26.3
+on Fabric — for the reasons described under
 [Newer Minecraft](#newer-minecraft).
 
 ## How the repository is laid out
@@ -194,7 +194,7 @@ Fabric and Forge cover 1.21.10 and 1.21.11.
 the Forge platform. NeoForge 26.x goes through the same Loom and works, so this
 is Forge-platform-specific.
 
-**Fabric goes all the way, including the current snapshot.** 26.x has no Yarn —
+**Fabric goes all the way through 26.3.** 26.x has no Yarn —
 intermediary exists, Yarn does not — because the game ships unobfuscated and the
 names in the jar are Mojang's. So the Fabric sources carry both spellings, as
 described under [How the repository is laid out](#how-the-repository-is-laid-out),
@@ -202,18 +202,16 @@ and the build drops the `mappings` dependency and switches Loom to its no-remap
 plugin for those targets. The jar off the compiler is the jar that ships:
 `remapJar` has nothing to remap.
 
-Fabric Loader normalises Minecraft's version ids into its own semver, and
-snapshots don't survive that intact — `26.3-snapshot-7` is `26.3-alpha.7` to the
-loader. `fabric.mod.json` gets the loader's spelling, or the mod would refuse to
-load on the version it was built for.
+Fabric Loader normalises Minecraft's snapshot version ids into its own semver.
+`fabric.mod.json` gets the loader's spelling so snapshot builds load on the
+version they target.
 
 Yarn's unpick v3 is *not* a wall, despite an earlier note here saying so.
 
-**NeoForge stops at 26.2, because that is as far as NeoForge goes.** There is no
-26.3 build on their Maven, snapshot or otherwise, so there is nothing to build
-against — this one is upstream, not here. Run the **Loader builds** workflow
-against `26.3-snapshot-7` to see whether that has changed; if it has, adding it
-is the three steps below.
+**NeoForge stops at 26.2, because that is as far as NeoForge goes.** There was no
+26.3 build on its Maven when 26.3 shipped, so there is nothing to build against.
+Run the **Loader builds** workflow against `26.3` to see whether that has changed.
+If it has, add the target with the three steps below.
 
 ## Adding a Minecraft version
 
