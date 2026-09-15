@@ -37,18 +37,37 @@ public class MinecraftMixin {
      * Vanilla checks whether the targeted block is air before starting to break
      * it. If it isn't air but also isn't solid, we look for an entity behind it
      * and report air, which drops vanilla into its "swing at nothing" path.
+     *
+     * <p>Forge's own patch to Minecraft rewrites that guard from
+     * {@code level.getBlockState(pos).isAir()} to {@code level.isEmptyBlock(pos)}
+     * on 1.15 and later (and on NeoForge's first 1.20.2 release), so the call a
+     * redirect can name differs per loader and version. From 1.15 the guard is
+     * {@code isEmptyBlock}; naming {@code getBlockState} there either finds
+     * nothing to redirect (1.15&ndash;1.17.1, where the method no longer calls
+     * it at all) or latches onto the wrong call (1.18.2+, where the remaining
+     * {@code getBlockState} is the "did it break?" check after
+     * {@code startDestroyBlock}).
      */
     //? if >=1.15 {
     @Redirect(method = "startAttack", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/client/multiplayer/ClientLevel;getBlockState(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;",
+            target = "Lnet/minecraft/client/multiplayer/ClientLevel;isEmptyBlock(Lnet/minecraft/core/BlockPos;)Z",
             ordinal = 0))
-    private BlockState cleancut$attackThroughBlock(net.minecraft.client.multiplayer.ClientLevel level, BlockPos pos) {
+    private boolean cleancut$attackThroughBlock(net.minecraft.client.multiplayer.ClientLevel level, BlockPos pos) {
+        if (level.isEmptyBlock(pos)) {
+            return true;
+        }
+        Entity entity = CleanCut.findTarget((Minecraft) (Object) this, level.getBlockState(pos), pos);
+        if (entity == null) {
+            return false;
+        }
+        this.gameMode.attack(this.player, entity);
+        return true;
+    }
     //?} else {
     /*@Redirect(method = "startAttack", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/multiplayer/MultiPlayerLevel;getBlockState(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;",
             ordinal = 0))
     private BlockState cleancut$attackThroughBlock(net.minecraft.client.multiplayer.MultiPlayerLevel level, BlockPos pos) {
-    *///?}
         BlockState state = level.getBlockState(pos);
         if (state.isAir()) {
             return state;
@@ -60,6 +79,7 @@ public class MinecraftMixin {
         this.gameMode.attack(this.player, entity);
         return Blocks.AIR.defaultBlockState();
     }
+    *///?}
 
     //? if >=1.19 {
     @Redirect(method = "startUseItem", at = @At(value = "INVOKE",
