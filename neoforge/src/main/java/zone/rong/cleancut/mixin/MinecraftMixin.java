@@ -31,8 +31,31 @@ public class MinecraftMixin {
      * Vanilla checks whether the targeted block is air before starting to break
      * it. If it isn't air but also isn't solid, we look for an entity behind it
      * and report air, which drops vanilla into its "swing at nothing" path.
+     *
+     * <p>NeoForge's own patch to Minecraft rewrote that guard from
+     * {@code level.getBlockState(pos).isAir()} to {@code level.isEmptyBlock(pos)}
+     * on its first 1.20.2 release, and reverted it afterwards, so the call a
+     * redirect can name differs by version. Naming {@code getBlockState} on
+     * 1.20.2 latches onto the wrong call - the "did it break?" check after
+     * {@code startDestroyBlock} - instead of the guard.
      */
+    //? if <1.20.3 {
     @Redirect(method = "startAttack", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/multiplayer/ClientLevel;isEmptyBlock(Lnet/minecraft/core/BlockPos;)Z",
+            ordinal = 0))
+    private boolean cleancut$attackThroughBlock(ClientLevel level, BlockPos pos) {
+        if (level.isEmptyBlock(pos)) {
+            return true;
+        }
+        Entity entity = CleanCut.findTarget((Minecraft) (Object) this, level.getBlockState(pos), pos);
+        if (entity == null) {
+            return false;
+        }
+        this.gameMode.attack(this.player, entity);
+        return true;
+    }
+    //?} else {
+    /*@Redirect(method = "startAttack", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/multiplayer/ClientLevel;getBlockState(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;",
             ordinal = 0))
     private BlockState cleancut$attackThroughBlock(ClientLevel level, BlockPos pos) {
@@ -47,6 +70,7 @@ public class MinecraftMixin {
         this.gameMode.attack(this.player, entity);
         return Blocks.AIR.defaultBlockState();
     }
+    *///?}
 
     @Redirect(method = "startUseItem", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;useItemOn(Lnet/minecraft/client/player/LocalPlayer;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/BlockHitResult;)Lnet/minecraft/world/InteractionResult;"))
