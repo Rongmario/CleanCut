@@ -39,7 +39,7 @@ def versionData = [
         '26.1.1': [neoforge: '26.1.1.15-beta', java: 25],  // no stable build
         '26.1.2': [neoforge: '26.1.2.93', java: 25],   // .94 has no installer
         '26.2'  : [neoforge: '26.2.0.48-beta', java: 25],  // no stable build
-        // No 26.3 row: NeoForge has published nothing for that line yet.
+        '26.3'  : [neoforge: '26.3.0.103', java: 25],
 ]
 
 def minecraftVersion = stonecutter.current.version
