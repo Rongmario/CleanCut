@@ -220,6 +220,11 @@
     "java": 25
   },
   {
+    "branch": "fabric",
+    "minecraft": "26.4-snapshot-8",
+    "java": 25
+  },
+  {
     "branch": "forge",
     "minecraft": "1.14.4",
     "java": 21
@@ -380,6 +385,31 @@
     "java": 21
   },
   {
+    "branch": "forge",
+    "minecraft": "26.1",
+    "java": 25
+  },
+  {
+    "branch": "forge",
+    "minecraft": "26.1.1",
+    "java": 25
+  },
+  {
+    "branch": "forge",
+    "minecraft": "26.1.2",
+    "java": 25
+  },
+  {
+    "branch": "forge",
+    "minecraft": "26.2",
+    "java": 25
+  },
+  {
+    "branch": "forge",
+    "minecraft": "26.3",
+    "java": 25
+  },
+  {
     "branch": "neoforge",
     "minecraft": "1.20.2",
     "java": 21
@@ -472,6 +502,11 @@
   {
     "branch": "neoforge",
     "minecraft": "26.2",
+    "java": 25
+  },
+  {
+    "branch": "neoforge",
+    "minecraft": "26.3",
     "java": 25
   }
 ]

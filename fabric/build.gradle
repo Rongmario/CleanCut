@@ -65,6 +65,7 @@ def versionData = [
         '26.1.2' : [mappings: null, java: 25, loader: '0.19.3'],
         '26.2'   : [mappings: null, java: 25, loader: '0.19.3'],
         '26.3'   : [mappings: null, java: 25, loader: '0.19.5'],
+        '26.4-snapshot-8': [mappings: null, java: 25, loader: '0.20.1'],
 ]
 
 def minecraftVersion = stonecutter.current.version

@@ -3,8 +3,10 @@ plugins {
     // that - remapping a jar that was never obfuscated is not a no-op, it is a
     // step that has nothing to work from. Both are declared and one is applied
     // below, once the version being built is known.
-    id 'dev.architectury.loom' version '1.17.485' apply false
-    id 'dev.architectury.loom-no-remap' version '1.17.485' apply false
+    // 1.17.487 at least: 1.17.485 throws an NPE setting Minecraft 26 up on
+    // the Forge platform.
+    id 'dev.architectury.loom' version '1.17.487' apply false
+    id 'dev.architectury.loom-no-remap' version '1.17.487' apply false
     id 'me.modmuss50.mod-publish-plugin' version '2.2.0'
 }
 
@@ -64,6 +66,7 @@ def versionData = [
         '26.1.1': [forge: '26.1.1-63.0.2', java: 25],
         '26.1.2': [forge: '26.1.2-64.1.0', java: 25],
         '26.2'  : [forge: '26.2-65.1.0', java: 25],
+        '26.3'  : [forge: '26.3-66.1.8', java: 25],
 ]
 
 def minecraftVersion = stonecutter.current.version
